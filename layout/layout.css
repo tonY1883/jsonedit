@@ -1,0 +1,40 @@
+html {
+    overflow: hidden;
+    background-color: darkgray;
+}
+
+#top-bar {
+    display: inline-block;
+    border-bottom: ridge 2px;
+    padding-bottom: 10px;
+    top: 0;
+    width: 100%;
+    height: 5vh;
+}
+
+#save-file-button {
+    visibility: hidden;
+}
+
+main {
+    display: flex;
+    height: 95vh;
+}
+
+#browser {
+    float: left;
+    width: 18%;
+    border-right: ridge 2px;
+    height: 100%;
+    overflow: auto;
+
+}
+
+#editor {
+    display: inline-block;
+    width: 82%;
+    left: 15%;
+    height: 100%;
+    float: right;
+    overflow: auto;
+}

@@ -21,13 +21,46 @@ main {
     height: 95vh;
 }
 
+button, input {
+    font-size: 1em;
+}
+
 #browser {
     float: left;
     width: 18%;
     border-right: ridge 2px;
     height: 100%;
     overflow: auto;
+    text-align: center;
 
+}
+
+#searchbox {
+    width: 80%;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+#tree {
+    background-color: white;
+    width: 80%;
+    height: 80%;
+    margin: auto;
+    padding: 5px;
+    text-align: left;
+    overflow: auto;
+}
+
+.jstree-default .jstree-anchor {
+    font-size: 1em;
+    height: 1em;
+    line-height: 1em;
+}
+
+.jstree-default .jstree-search {
+    font-style: normal;
+    color: black;
+    font-weight: normal;
 }
 
 #editor {

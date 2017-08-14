@@ -1,5 +1,5 @@
 var data;
-var scenes;
+var currentNode;
 
 var fname;
 
@@ -24,7 +24,6 @@ function loadFile(type) {
 function loadData(fileText) {
 	data = JSON.parse(fileText);
 	console.log(Array.isArray(data));
-	$('#editor').html(JSON.stringify(data));
 	$('#save-file-button').css('visibility', 'visible');
 	$('title').text("JSONEdit: " + fname);
 	//assemble tree view
@@ -40,7 +39,6 @@ function loadData(fileText) {
 	treeObj.core["data"] = assembleTreeJson(data);
 	treeObj["plugins"] = treePlugins;
 	treeObj["search"] = treeSearchModule;
-	$('#editor').html(JSON.stringify(treeObj));
 	$('#tree').jstree("destroy").jstree(treeObj);
 }
 
@@ -75,6 +73,50 @@ function assembleTreeJson(object, name) {
 	}
 }
 
+function loadDatum(path) {
+	var pathComponents = path.split(">");
+	var index;
+	var targetObj;
+	$('#editor-content').empty();
+	index = 1;
+	targetObj = data;
+	for (var i = index; i < pathComponents.length; i++) {
+		targetObj = targetObj[pathComponents[i]];
+	}
+	//TODO reduce repeated code
+	if (Array.isArray(targetObj)) {
+		$.each(targetObj, function (i, o) {
+			if (isObject(o)) {
+				$('#editor-content').append("<div class=\"table-row\">" +
+											"<input class=\"key-input\" disabled value=" + i + "> : " +
+											"<textarea class=\"table-cell value-input\" disabled value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"</div>");
+			} else {
+				$('#editor-content').append("<div class=\"table-row\">" +
+											"<input class=\"key-input\" disabled value=" + i + "> : " +
+											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"</div>");
+			}
+
+		});
+	} else {
+		$.each(targetObj, function (i, o) {
+			if (isObject(o)) {
+				$('#editor-content').append("<div class=\"table-row\">" +
+											"<input class=\"key-input\" value=" + i + "> : " +
+											"<textarea class=\"table-cell value-input\" disabled value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"</div>");
+			} else {
+				$('#editor-content').append("<div class=\"table-row\">" +
+											"<input class=\"key-input\" value=" + i + "> : " +
+											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"</div>");
+			}
+		});
+	}
+
+}
+
 function isObject(obj) {
 	return obj === Object(obj);
 }
@@ -105,4 +147,9 @@ $("#searchbox").keyup(function () {
 	$('#tree').jstree('search', searchString);
 });
 
-//TODO load real stuff
+$(document).on('click', '.jstree-anchor', function (e) {
+	var anchorId = $(this).parent().attr('id');
+	var clickId = anchorId.substring(anchorId.indexOf('_') + 1, anchorId.length);
+	//$('#tree').jstree().get_path($('#tree').jstree("get_selected", true)[0], ' > ');
+	loadDatum($('#tree').jstree().get_path($('#tree').jstree("get_selected", true)[0], '>'));
+});

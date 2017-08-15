@@ -39,6 +39,7 @@ function loadData(fileText) {
 	treeObj.core["data"] = assembleTreeJson(data);
 	treeObj["plugins"] = treePlugins;
 	treeObj["search"] = treeSearchModule;
+	console.log(JSON.stringify(treeObj));
 	$('#tree').jstree("destroy").jstree(treeObj);
 }
 
@@ -49,24 +50,29 @@ function assembleTreeJson(object, name) {
 	}
 	result['text'] = name;
 	if (Array.isArray(object)) {
-		var ary = [object.length];
+		var ary = [];
+		var children = false;
 		$.each(object, function (i, o) {
 			var uname = i.toString();
 			if (isObject(o) || Array.isArray(o)) {
+				children = true;
 				ary[i] = assembleTreeJson(o, uname);
 			}
-
 		});
-		result['children'] = ary;
-		var rAry = [];
-		rAry[0] = result;
-		return rAry;
+		if (children) {
+			result['children'] = ary;
+		}
+		return result;
 	} else if (isObject(object)) {
+		var ary = [];
+		var c = 0;
 		$.each(object, function (i, o) {
 			if (isObject(o) || Array.isArray(o)) {
-				result['children'] = assembleTreeJson(o, i);
+				ary[c] = assembleTreeJson(o, i);
+				c++;
 			}
 		});
+		result['children'] = ary;
 		return result;
 	} else {
 		return null;

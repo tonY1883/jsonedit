@@ -95,3 +95,10 @@ textarea {
 	width: 65%;
 
 }
+
+#save-btn {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+	display: block;
+}

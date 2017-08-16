@@ -1,5 +1,6 @@
 var data;
 var currentNode;
+var currentNodePath;
 
 var fname;
 
@@ -23,7 +24,6 @@ function loadFile(type) {
 
 function loadData(fileText) {
 	data = JSON.parse(fileText);
-	console.log(Array.isArray(data));
 	$('#save-file-button').css('visibility', 'visible');
 	$('title').text("JSONEdit: " + fname);
 	//assemble tree view
@@ -39,7 +39,6 @@ function loadData(fileText) {
 	treeObj.core["data"] = assembleTreeJson(data);
 	treeObj["plugins"] = treePlugins;
 	treeObj["search"] = treeSearchModule;
-	console.log(JSON.stringify(treeObj));
 	$('#tree').jstree("destroy").jstree(treeObj);
 }
 
@@ -89,9 +88,11 @@ function loadDatum(path) {
 	for (var i = index; i < pathComponents.length; i++) {
 		targetObj = targetObj[pathComponents[i]];
 	}
+	currentNode = targetObj;
+	currentNodePath = path;
 	//TODO reduce repeated code
-	if (Array.isArray(targetObj)) {
-		$.each(targetObj, function (i, o) {
+	if (Array.isArray(currentNode)) {
+		$.each(currentNode, function (i, o) {
 			if (isObject(o)) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" disabled value=" + i + "> : " +
@@ -120,6 +121,21 @@ function loadDatum(path) {
 			}
 		});
 	}
+	if (!$('#save-btn').length) {
+		$('#editor-content').append($('<button id="save-btn" class="save-btn">Save</button>'));
+		$('#save-btn').click(function () {
+			saveDatum();
+		})
+	}
+
+}
+
+function saveDatum() {
+	var keys = $('.key-input');
+	var values = $('.value-input');
+	$.each(keys, function (i, o) {
+		currentNode[o.value] = values[i].value;
+	});
 
 }
 

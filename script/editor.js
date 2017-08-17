@@ -1,6 +1,9 @@
 var data;
 var currentNode;
+var currentNodeMaxIndex;
 var currentNodePath;
+
+var editingLength
 
 var fname;
 
@@ -92,6 +95,7 @@ function loadDatum(path) {
 	currentNodePath = path;
 	//TODO reduce repeated code
 	if (Array.isArray(currentNode)) {
+		currentNodeMaxIndex = currentNode.length;
 		$.each(currentNode, function (i, o) {
 			if (isObject(o)) {
 				$('#editor-content').append("<div class=\"table-row\">" +
@@ -121,6 +125,30 @@ function loadDatum(path) {
 			}
 		});
 	}
+	if (!$('.new').length) {
+		$('#editor-content').append("<div class=\"table-row\" id='new-row'>" +
+									"<button class=\"new\" >Add new value</button> " +
+									"</div>");
+		$('.new').click(function () {
+			console.log("new row");
+			var newRow;
+			if (Array.isArray(currentNode)) {
+				newRow = $("<div class=\"table-row\">" +
+						   "<input class=\"key-input\" disabled value=" + (currentNodeMaxIndex++) + "> : " +
+						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
+						   "</div>");
+			} else {
+				newRow = $("<div class=\"table-row\">" +
+						   "<input class=\"key-input\" > : " +
+						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
+						   "</div>");
+			}
+
+			newRow.insertBefore($('#new-row'));
+
+		})
+	}
+
 	if (!$('#save-btn').length) {
 		$('#editor-content').append($('<button id="save-btn" class="save-btn">Save</button>'));
 		$('#save-btn').click(function () {

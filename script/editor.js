@@ -3,8 +3,6 @@ var currentNode;
 var currentNodeMaxIndex;
 var currentNodePath;
 
-var editingLength
-
 var fname;
 
 function loadFile(type) {
@@ -25,9 +23,10 @@ function loadFile(type) {
 	fileSelector.click();
 }
 
-function loadData(fileText) {
-	data = JSON.parse(fileText);
+function loadData(string) {
+	data = JSON.parse(string);
 	$('#save-file-button').css('visibility', 'visible');
+	$('#save-string-button').css('visibility', 'visible');
 	$('title').text("JSONEdit: " + fname);
 	//assemble tree view
 	var treeObj = {};
@@ -192,6 +191,31 @@ $('#load-file-button').click(function () {
 
 });
 
+$('#save-string-button').click(function () {
+	$('#modal-string-out-bg').show().click(function (e) {
+		$(this).hide();
+	}).children().click(function (e) {
+		return false;
+	});
+	$('#string-output').val(JSON.stringify(data)).focus().select();
+	$('#copy-string').click(function () {
+		$('#string-output').focus().select();
+		document.execCommand("copy");
+	});
+});
+
+$('#load-string-button').click(function () {
+	$('#modal-string-bg').show().click(function (e) {
+		$(this).hide();
+	}).children().click(function (e) {
+		return false;
+	});
+	$('#load-string').click(function () {
+		loadData($('#string-input').val());
+		$('#modal-string-bg').hide();
+	});
+});
+
 $("#searchbox").keyup(function () {
 	var searchString = $(this).val();
 	$('#tree').jstree('search', searchString);
@@ -203,3 +227,4 @@ $(document).on('click', '.jstree-anchor', function (e) {
 	//$('#tree').jstree().get_path($('#tree').jstree("get_selected", true)[0], ' > ');
 	loadDatum($('#tree').jstree().get_path($('#tree').jstree("get_selected", true)[0], '>'));
 });
+

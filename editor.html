@@ -15,9 +15,31 @@
 		<script src="lib/jstree/jstree.js"></script>
 	</head>
 	<body>
+		<div class="modal" id="modal-string-bg">
+			<div id="modal-string" class="modal-content">
+				<h2>Load from JSON string</h2>
+				<textarea id="string-input" class="string-input" placeholder="Enter your JSON string here"></textarea>
+				<p align="right">
+					<button id="load-string">Load JSON string</button>
+				</p>
+
+			</div>
+		</div>
+		<div class="modal" id="modal-string-out-bg">
+			<div id="modal-string-out" class="modal-content">
+				<h2>Output as JSON string</h2>
+				<textarea id="string-output" class="string-input" readonly></textarea>
+				<p align="right">
+					<button id="copy-string">Copy to clipboard</button>
+				</p>
+
+			</div>
+		</div>
 		<div id="top-bar">
 			<button id="load-file-button">Load JSON file</button>
+			<button id="load-string-button">Load JSON String</button>
 			<button id="save-file-button">Save JSON file</button>
+			<button id="save-string-button">Export JSON String</button>
 		</div>
 		<main>
 			<div id="browser">

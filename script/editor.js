@@ -24,10 +24,16 @@ function loadFile(type) {
 }
 
 function loadData(string) {
-	data = JSON.parse(string);
+	try {
+		data = JSON.parse(string);
+	} catch (err) {
+		alert("Your JSON is not properly formatted!\n" + err.message);
+	}
 	$('#save-file-button').css('visibility', 'visible');
 	$('#save-string-button').css('visibility', 'visible');
-	$('title').text("JSONEdit: " + fname);
+	if (fname !== undefined) {
+		$('title').text("JSONEdit: " + fname);
+	}
 	//assemble tree view
 	var treeObj = {};
 	var treePlugins = [
@@ -42,6 +48,7 @@ function loadData(string) {
 	treeObj["plugins"] = treePlugins;
 	treeObj["search"] = treeSearchModule;
 	$('#tree').jstree("destroy").jstree(treeObj);
+	$('#editor-content').empty();
 }
 
 function assembleTreeJson(object, name) {
@@ -98,12 +105,12 @@ function loadDatum(path) {
 		$.each(currentNode, function (i, o) {
 			if (isObject(o)) {
 				$('#editor-content').append("<div class=\"table-row\">" +
-											"<input class=\"key-input\" disabled value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" disabled value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<input class=\"key-input\" readonly value=" + i + "> : " +
+											"<textarea class=\"table-cell value-input\" readonly value=" + o + " id=\"id-input\">" + o + "</textarea>" +
 											"</div>");
 			} else {
 				$('#editor-content').append("<div class=\"table-row\">" +
-											"<input class=\"key-input\" disabled value=" + i + "> : " +
+											"<input class=\"key-input\" readonly value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
 											"</div>");
 			}
@@ -114,7 +121,7 @@ function loadDatum(path) {
 			if (isObject(o)) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" disabled value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<textarea class=\"table-cell value-input\" readonly value=" + o + " id=\"id-input\">" + o + "</textarea>" +
 											"</div>");
 			} else {
 				$('#editor-content').append("<div class=\"table-row\">" +
@@ -129,11 +136,10 @@ function loadDatum(path) {
 									"<button class=\"new\" >Add new value</button> " +
 									"</div>");
 		$('.new').click(function () {
-			console.log("new row");
 			var newRow;
 			if (Array.isArray(currentNode)) {
 				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" disabled value=" + (currentNodeMaxIndex++) + "> : " +
+						   "<input class=\"key-input\" readonly value=" + (currentNodeMaxIndex++) + "> : " +
 						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
 						   "</div>");
 			} else {
@@ -142,10 +148,8 @@ function loadDatum(path) {
 						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
 						   "</div>");
 			}
-
 			newRow.insertBefore($('#new-row'));
-
-		})
+		});
 	}
 
 	if (!$('#save-btn').length) {
@@ -154,6 +158,12 @@ function loadDatum(path) {
 			saveDatum();
 		})
 	}
+	$('input[readonly]').keydown(function () {
+		alert("Array indices cannot be modified!")
+	});
+	$('textarea[readonly]').keydown(function () {
+		alert("Objects and arrays must be edited in their own node!")
+	})
 
 }
 

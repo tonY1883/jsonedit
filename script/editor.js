@@ -107,11 +107,13 @@ function loadDatum(path) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" readonly value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" readonly value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<button class='delete-row'>Delete</button>" +
 											"</div>");
 			} else {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" readonly value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<button class='delete-row'>Delete</button>" +
 											"</div>");
 			}
 
@@ -122,11 +124,13 @@ function loadDatum(path) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" readonly value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<button class='delete-row'>Delete</button>" +
 											"</div>");
 			} else {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<button class='delete-row'>Delete</button>" +
 											"</div>");
 			}
 		});
@@ -139,16 +143,24 @@ function loadDatum(path) {
 			var newRow;
 			if (Array.isArray(currentNode)) {
 				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" readonly value=" + (currentNodeMaxIndex++) + "> : " +
+						   "<input class=\"key-input\" readonly value=\"\"> : " +
 						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
+						   "<button class='delete-row'>Delete</button>" +
 						   "</div>");
 			} else {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" > : " +
 						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
+						   "<button class='delete-row'>Delete</button>" +
 						   "</div>");
 			}
 			newRow.insertBefore($('#new-row'));
+			$('.delete-row').click(function () {
+				$(this).parent().remove();
+				if (Array.isArray(currentNode)) {
+					reloadIndices();
+				}
+			})
 		});
 	}
 
@@ -158,13 +170,25 @@ function loadDatum(path) {
 			saveDatum();
 		})
 	}
-	$('input[readonly]').keydown(function () {
+	$('.key-input[readonly]').keydown(function () {
 		alert("Array indices cannot be modified!")
 	});
-	$('textarea[readonly]').keydown(function () {
+	$('.value-input[readonly]').keydown(function () {
 		alert("Objects and arrays must be edited in their own node!")
 	})
+	$('.delete-row').click(function () {
+		$(this).parent().remove();
+		if (Array.isArray(currentNode)) {
+			reloadIndices();
+		}
+	})
+}
 
+function reloadIndices() {
+	var keys = $('.key-input');
+	$.each(keys, function (i, o) {
+		o.value = i;
+	});
 }
 
 function saveDatum() {
@@ -211,6 +235,7 @@ $('#save-string-button').click(function () {
 	$('#copy-string').click(function () {
 		$('#string-output').focus().select();
 		document.execCommand("copy");
+		alert("Output JSON copied to your clipboard.");
 	});
 });
 

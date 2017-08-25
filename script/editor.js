@@ -27,12 +27,15 @@ function loadData(string) {
 	try {
 		data = JSON.parse(string);
 	} catch (err) {
-		alert("Your JSON is not properly formatted!\n" + err.message);
+		alert("Your JSON is not properly formatted!\n" + "Fail to parse JSON: " + err.message);
+		return;
 	}
 	$('#save-file-button').css('visibility', 'visible');
 	$('#save-string-button').css('visibility', 'visible');
 	if (fname !== undefined) {
 		$('title').text("JSONEdit: " + fname);
+	} else {
+		fname = "JSON.json";
 	}
 	//assemble tree view
 	var treeObj = {};
@@ -155,12 +158,9 @@ function loadDatum(path) {
 						   "</div>");
 			}
 			newRow.insertBefore($('#new-row'));
-			$('.delete-row').click(function () {
-				$(this).parent().remove();
-				if (Array.isArray(currentNode)) {
-					reloadIndices();
-				}
-			})
+			reloadIndices();
+			setNotEditable();
+			setDelete()
 		});
 	}
 
@@ -170,25 +170,37 @@ function loadDatum(path) {
 			saveDatum();
 		})
 	}
+	setNotEditable();
+	setDelete();
+}
+
+function reloadIndices() {
+	if (Array.isArray(currentNode)) {
+		var keys = $('.key-input');
+		$.each(keys, function (i, o) {
+			o.value = i;
+		});
+	} else {
+		//no need to reload.
+	}
+}
+
+function setNotEditable() {
 	$('.key-input[readonly]').keydown(function () {
 		alert("Array indices cannot be modified!")
 	});
 	$('.value-input[readonly]').keydown(function () {
 		alert("Objects and arrays must be edited in their own node!")
 	})
+}
+
+function setDelete() {
 	$('.delete-row').click(function () {
 		$(this).parent().remove();
 		if (Array.isArray(currentNode)) {
 			reloadIndices();
 		}
 	})
-}
-
-function reloadIndices() {
-	var keys = $('.key-input');
-	$.each(keys, function (i, o) {
-		o.value = i;
-	});
 }
 
 function saveDatum() {
@@ -222,6 +234,27 @@ $('#save-file-button').click(function () {
 
 $('#load-file-button').click(function () {
 	loadFile('.json');
+
+});
+
+$('#new-json-button').click(function () {
+	$('#modal-new-json-bg').show();
+	window.onclick = function (event) {
+		if (event.target == $('#modal-new-json-bg')[0]) {
+			$('#modal-new-json-bg').hide();
+		}
+	}
+	$('#new-json').click(function () {
+		if ($('#option-ary')[0].checked === true) {
+			loadData("[]");
+			$('#modal-new-json-bg').hide();
+		} else if ($('#option-obj')[0].checked === true) {
+			loadData("{}");
+			$('#modal-new-json-bg').hide();
+		} else {
+
+		}
+	});
 
 });
 

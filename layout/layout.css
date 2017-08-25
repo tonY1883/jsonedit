@@ -21,6 +21,11 @@ main {
 	height: 95vh;
 }
 
+button {
+	text-align: center;
+	padding: 5px;
+}
+
 button, input {
 	font-size: 1em;
 }
@@ -126,8 +131,19 @@ textarea {
 }
 
 .modal-content {
+	z-index: 1000;
 	display: block;
 	width: 60vw;
+	background-color: white;
+	margin: auto;
+	margin-top: 10%;
+	padding: 25px;
+}
+
+.modal-content-small {
+	z-index: 1000;
+	display: block;
+	width: 20vw;
 	background-color: white;
 	margin: auto;
 	margin-top: 10%;

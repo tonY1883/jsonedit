@@ -35,7 +35,20 @@
 
 			</div>
 		</div>
+		<div class="modal" id="modal-new-json-bg">
+			<div id="modal-new-json-root" class="modal-content-small">
+				<h2>Choose a root node</h2>
+				<label><input name="root" type="radio" id="option-ary" value="ary">Array</label><br>
+				<label><input name="root" type="radio" id="option-obj" value="obj">Object</label>
+				<p align="right">
+					<button id="new-json">Create new JSON</button>
+				</p>
+
+			</div>
+		</div>
 		<div id="top-bar">
+			<!-- TODO change this to nav bar with menus? -->
+			<button id="new-json-button">New JSON</button>
 			<button id="load-file-button">Load JSON file</button>
 			<button id="load-string-button">Load JSON String</button>
 			<button id="save-file-button">Save JSON file</button>

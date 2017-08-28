@@ -109,7 +109,7 @@ function loadDatum(path) {
 			if (isObject(o)) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" readonly value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" readonly value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
 											"<button class='delete-row'>Delete</button>" +
 											"</div>");
 			} else {
@@ -126,7 +126,7 @@ function loadDatum(path) {
 			if (isObject(o)) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" readonly value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+											"<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
 											"<button class='delete-row'>Delete</button>" +
 											"</div>");
 			} else {
@@ -204,11 +204,34 @@ function setDelete() {
 }
 
 function saveDatum() {
+	var currentNodeOld = JSON.parse(JSON.stringify(currentNode));//deep cloning (JSON compatible only)
+	var oldKeys = Object.keys(currentNodeOld);
 	var keys = $('.key-input');
+	var newKeys = [];
 	var values = $('.value-input');
 	$.each(keys, function (i, o) {
-		currentNode[o.value] = values[i].value;
+		newKeys.push(o.value);
+		if ($(values[i]).prop('readonly')) {
+			if ($.inArray(o.value, oldKeys) > -1) {
+				//do nothing -- editing prohibited
+			} else {
+				//okay, that's new
+				currentNode[o.value] = JSON.parse(values[i].value);
+			}
+		} else {
+			currentNode[o.value] = values[i].value;
+		}
+
 	});
+	//remove unwanted properties
+	$.each(oldKeys, function (i, o) {
+		if ($.inArray(o, newKeys) < 0) {
+			delete currentNode[o]
+		}
+	});
+
+
+	alert("Content saved.")
 
 }
 

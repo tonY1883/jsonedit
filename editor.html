@@ -46,17 +46,32 @@
 
 			</div>
 		</div>
-		<div id="top-bar">
+		<nav id="top-bar">
 			<!-- TODO change this to nav bar with menus? -->
-			<button id="new-json-button">New JSON</button>
-			<button id="load-file-button">Load JSON file</button>
-			<button id="load-string-button">Load JSON String</button>
-			<button id="save-file-button">Save JSON file</button>
-			<button id="save-string-button">Export JSON String</button>
-		</div>
+			<ul>
+				<li>
+					<button id="new-json-button" class="bar-items">New...</button>
+				</li>
+				<li>
+					<button id="load-json-button" class="bar-items">Load...</button>
+					<ul>
+						<li class="menu-items"><a id="load-file-button">From JSON File</a></li>
+						<li class="menu-items"><a id="load-string-button">From JSON String</a></li>
+					</ul>
+				</li>
+				<li id="save-json-button">
+					<button class="bar-items">Save...</button>
+					<ul>
+						<li class="menu-items"><a id="save-file-button">As JSON File</a></li>
+						<li class="menu-items"><a id="save-string-button">As JSON String</a></li>
+					</ul>
+				</li>
+			</ul>
+
+		</nav>
 		<main>
 			<div id="browser">
-				<input id="searchbox" type="text"/>
+				<input id="searchbox"/>
 				<div id="tree"></div>
 			</div>
 			<div id="editor">

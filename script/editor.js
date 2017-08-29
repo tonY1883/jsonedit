@@ -30,8 +30,7 @@ function loadData(string) {
 		alert("Your JSON is not properly formatted!\n" + "Fail to parse JSON: " + err.message);
 		return;
 	}
-	$('#save-file-button').css('visibility', 'visible');
-	$('#save-string-button').css('visibility', 'visible');
+	$('#save-json-button').css('visibility', 'visible');
 	if (fname !== undefined) {
 		$('title').text("JSONEdit: " + fname);
 	} else {

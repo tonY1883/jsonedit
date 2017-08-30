@@ -31,6 +31,7 @@ function loadData(string) {
 		return;
 	}
 	$('#save-json-button').css('visibility', 'visible');
+	$('#browser').css('visibility', 'visible');
 	if (fname !== undefined) {
 		$('title').text("JSONEdit: " + fname);
 	} else {
@@ -260,23 +261,29 @@ $('#load-file-button').click(function () {
 });
 
 $('#new-json-button').click(function () {
-	$('#modal-new-json-bg').show();
-	window.onclick = function (event) {
-		if (event.target == $('#modal-new-json-bg')[0]) {
-			$('#modal-new-json-bg').hide();
+	if (data !== undefined) {
+		if (confirm("Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?")) {
+			$('#modal-new-json-bg').show();
+			window.onclick = function (event) {
+				if (event.target == $('#modal-new-json-bg')[0]) {
+					$('#modal-new-json-bg').hide();
+				}
+			};
+			$('#new-json').click(function () {
+				if ($('#option-ary')[0].checked === true) {
+					loadData("[]");
+					$('#modal-new-json-bg').hide();
+				} else if ($('#option-obj')[0].checked === true) {
+					loadData("{}");
+					$('#modal-new-json-bg').hide();
+				} else {
+
+				}
+			});
 		}
 	}
-	$('#new-json').click(function () {
-		if ($('#option-ary')[0].checked === true) {
-			loadData("[]");
-			$('#modal-new-json-bg').hide();
-		} else if ($('#option-obj')[0].checked === true) {
-			loadData("{}");
-			$('#modal-new-json-bg').hide();
-		} else {
 
-		}
-	});
+
 
 });
 

@@ -6,12 +6,7 @@
 		<title>JSONEdit</title>
 		<link href='lib/jstree/jstree.css' rel='stylesheet' type='text/css'>
 		<link href='layout/layout.css' rel='stylesheet' type='text/css'>
-		<script>
-			//load development jQuery
-			if (!window.jQuery) {
-				document.write('<script src="lib/jquery-3.1.1.js"><\/script>');
-			}
-		</script>
+		<script src="lib/jquery-3.1.1.js"></script>
 		<script src="lib/jstree/jstree.js"></script>
 	</head>
 	<body>
@@ -42,6 +37,17 @@
 				<label><input name="root" type="radio" id="option-obj" value="obj">Object</label>
 				<p align="right">
 					<button id="new-json">Create new JSON</button>
+				</p>
+
+			</div>
+		</div>
+		<div class="modal" id="modal-setting-bg">
+			<div id="modal-setting" class="modal-content-small">
+				<h2>Settings</h2>
+				<label><input checked name="setting" type="radio" id="option-type-convert" value="ary">Auto type conversion</label><br>
+				<p class="description">Automatically convert properties into their respective datatype(number, boolean etc.).</p>
+				<p align="right">
+					<button id="save-setting">Save</button>
 				</p>
 
 			</div>

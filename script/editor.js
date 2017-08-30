@@ -3,6 +3,8 @@ var currentNode;
 var currentNodeMaxIndex;
 var currentNodePath;
 
+var autoTypeConvert = true;
+
 var fname;
 
 function loadFile(type) {
@@ -219,7 +221,19 @@ function saveDatum() {
 				currentNode[o.value] = JSON.parse(values[i].value);
 			}
 		} else {
-			currentNode[o.value] = values[i].value;
+			if (autoTypeConvert) {
+				if (isNumber(values[i].value)) {
+					currentNode[o.value] = Number(values[i].value);
+				} else if (values[i].value === "true") {
+					currentNode[o.value] = true;
+				} else if (values[i].value === "false") {
+					currentNode[o.value] = false;
+				} else {
+					currentNode[o.value] = values[i].value;
+				}
+			} else {
+				currentNode[o.value] = values[i].value;
+			}
 		}
 
 	});
@@ -237,6 +251,10 @@ function saveDatum() {
 
 function isObject(obj) {
 	return obj === Object(obj);
+}
+
+function isNumber(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 function saveFile() {
@@ -262,27 +280,37 @@ $('#load-file-button').click(function () {
 
 $('#new-json-button').click(function () {
 	if (data !== undefined) {
-		if (confirm("Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?")) {
-			$('#modal-new-json-bg').show();
-			window.onclick = function (event) {
-				if (event.target == $('#modal-new-json-bg')[0]) {
-					$('#modal-new-json-bg').hide();
-				}
-			};
-			$('#new-json').click(function () {
-				if ($('#option-ary')[0].checked === true) {
-					loadData("[]");
-					$('#modal-new-json-bg').hide();
-				} else if ($('#option-obj')[0].checked === true) {
-					loadData("{}");
-					$('#modal-new-json-bg').hide();
-				} else {
-
-				}
-			});
+		if (!confirm("Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?")) {
+			return;
 		}
 	}
+	$('#modal-new-json-bg').show();
+	window.onclick = function (event) {
+		if (event.target == $('#modal-new-json-bg')[0]) {
+			$('#modal-new-json-bg').hide();
+		}
+	};
+	$('#new-json').click(function () {
+		if ($('#option-ary')[0].checked === true) {
+			loadData("[]");
+			$('#modal-new-json-bg').hide();
+		} else if ($('#option-obj')[0].checked === true) {
+			loadData("{}");
+			$('#modal-new-json-bg').hide();
+		}
+	});
+});
 
+$('#setting-button').click(function () {
+	$('#modal-setting-bg').show();
+	window.onclick = function (event) {
+		if (event.target == $('#modal-setting-bg')[0]) {
+			$('#modal-setting-bg').hide();
+		}
+	};
+	$('#save-setting').click(function () {
+		autoTypeConvert = $('#option-type-convert')[0].checked;
+	});
 
 
 });

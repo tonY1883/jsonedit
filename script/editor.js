@@ -26,10 +26,11 @@ function loadFile(type) {
 }
 
 function loadData(string) {
+	//TODO refresh not reload
 	try {
 		data = JSON.parse(string);
 	} catch (err) {
-		alert("Your JSON is not properly formatted!\n" + "Fail to parse JSON: " + err.message);
+		alert("Your JSON contains syntax errors!\n" + "Fail to parse JSON: " + err.message);
 		return;
 	}
 	$('#save-json-button').css('visibility', 'visible');
@@ -141,10 +142,19 @@ function loadDatum(path) {
 		});
 	}
 	if (!$('.new').length) {
+		//TODO can this be fixed not generated every time?
 		$('#editor-content').append("<div class=\"table-row\" id='new-row'>" +
-									"<button class=\"new\" >Add new value</button> " +
+									"<button class=\"new\" >New...</button> " + "<ul class='menu' id='new-option'>" +
+									"<li class=\"menu-items\" id=\"new-value-button\"><a >Value</a></li>" +
+									"<li class=\"menu-items\"id=\"new-array-button\"><a >Array</a></li>" +
+									"<li class=\"menu-items\"id=\"new-object-button\"><a >Object</a></li>" +
+									"</ul>" +
 									"</div>");
 		$('.new').click(function () {
+			$('#new-option').show();
+		});
+		$('#new-value-button').click(function () {
+			$('#new-option').hide();
 			var newRow;
 			if (Array.isArray(currentNode)) {
 				newRow = $("<div class=\"table-row\">" +
@@ -162,7 +172,50 @@ function loadDatum(path) {
 			newRow.insertBefore($('#new-row'));
 			reloadIndices();
 			setNotEditable();
-			setDelete()
+			setDelete();
+		});
+		$('#new-array-button').click(function () {
+			$('#new-option').hide();
+			var newRow;
+			if (Array.isArray(currentNode)) {
+				newRow = $("<div class=\"table-row\">" +
+						   "<input class=\"key-input\" readonly value=\"\"> : " +
+						   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">[]</textarea>" +
+						   "<button class='delete-row'>Delete</button>" +
+						   "</div>");
+			} else {
+				newRow = $("<div class=\"table-row\">" +
+						   "<input class=\"key-input\" > : " +
+						   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">[]</textarea>" +
+						   "<button class='delete-row'>Delete</button>" +
+						   "</div>");
+			}
+			newRow.insertBefore($('#new-row'));
+			reloadIndices();
+			setNotEditable();
+			setDelete();
+		});
+
+		$('#new-object-button').click(function () {
+			$('#new-option').hide();
+			var newRow;
+			if (Array.isArray(currentNode)) {
+				newRow = $("<div class=\"table-row\">" +
+						   "<input class=\"key-input\" readonly value=\"\"> : " +
+						   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">{}</textarea>" +
+						   "<button class='delete-row'>Delete</button>" +
+						   "</div>");
+			} else {
+				newRow = $("<div class=\"table-row\">" +
+						   "<input class=\"key-input\" > : " +
+						   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">{}</textarea>" +
+						   "<button class='delete-row'>Delete</button>" +
+						   "</div>");
+			}
+			newRow.insertBefore($('#new-row'));
+			reloadIndices();
+			setNotEditable();
+			setDelete();
 		});
 	}
 
@@ -174,6 +227,7 @@ function loadDatum(path) {
 	}
 	setNotEditable();
 	setDelete();
+	$('#edit-button').css('visibility', 'visible');
 }
 
 function reloadIndices() {
@@ -243,7 +297,8 @@ function saveDatum() {
 			delete currentNode[o]
 		}
 	});
-
+	//refresh tree
+	loadData(JSON.stringify(data));
 
 	alert("Content saved.")
 

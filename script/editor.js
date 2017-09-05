@@ -63,6 +63,8 @@ function assembleTreeJson(object, name) {
 		name = object.constructor.name
 	}
 	result['text'] = name;
+	result["icon"] = false;
+	//TODO find proper icons
 	if (Array.isArray(object)) {
 		var ary = [];
 		var children = false;
@@ -113,13 +115,13 @@ function loadDatum(path) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" readonly value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
-											"<button class='delete-row'>Delete</button>" +
+											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 											"</div>");
 			} else {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" readonly value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
-											"<button class='delete-row'>Delete</button>" +
+											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 											"</div>");
 			}
 
@@ -130,13 +132,13 @@ function loadDatum(path) {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
-											"<button class='delete-row'>Delete</button>" +
+											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 											"</div>");
 			} else {
 				$('#editor-content').append("<div class=\"table-row\">" +
 											"<input class=\"key-input\" value=" + i + "> : " +
 											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
-											"<button class='delete-row'>Delete</button>" +
+											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 											"</div>");
 			}
 		});
@@ -144,7 +146,7 @@ function loadDatum(path) {
 	if (!$('.new').length) {
 		//TODO can this be fixed not generated every time?
 		$('#editor-content').append("<div class=\"table-row\" id='new-row'>" +
-									"<button class=\"new\" >New...</button> " + "<ul class='menu' id='new-option'>" +
+									"<button class=\"new\" ><i class=\"material-icons\" style=\"vertical-align: middle;\">add_circle</i>New...</button> " + "<ul class='menu' id='new-option'>" +
 									"<li class=\"menu-items\" id=\"new-value-button\"><a >Value</a></li>" +
 									"<li class=\"menu-items\"id=\"new-array-button\"><a >Array</a></li>" +
 									"<li class=\"menu-items\"id=\"new-object-button\"><a >Object</a></li>" +
@@ -160,13 +162,13 @@ function loadDatum(path) {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" readonly value=\"\"> : " +
 						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
-						   "<button class='delete-row'>Delete</button>" +
+						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 						   "</div>");
 			} else {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" > : " +
 						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
-						   "<button class='delete-row'>Delete</button>" +
+						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 						   "</div>");
 			}
 			newRow.insertBefore($('#new-row'));
@@ -181,13 +183,13 @@ function loadDatum(path) {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" readonly value=\"\"> : " +
 						   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">[]</textarea>" +
-						   "<button class='delete-row'>Delete</button>" +
+						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 						   "</div>");
 			} else {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" > : " +
 						   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">[]</textarea>" +
-						   "<button class='delete-row'>Delete</button>" +
+						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 						   "</div>");
 			}
 			newRow.insertBefore($('#new-row'));
@@ -203,13 +205,13 @@ function loadDatum(path) {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" readonly value=\"\"> : " +
 						   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">{}</textarea>" +
-						   "<button class='delete-row'>Delete</button>" +
+						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 						   "</div>");
 			} else {
 				newRow = $("<div class=\"table-row\">" +
 						   "<input class=\"key-input\" > : " +
 						   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">{}</textarea>" +
-						   "<button class='delete-row'>Delete</button>" +
+						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
 						   "</div>");
 			}
 			newRow.insertBefore($('#new-row'));

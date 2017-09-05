@@ -20,22 +20,27 @@ body {
 }
 
 .bar-items {
-	border: none;
-	background-color: transparent;
-	color: #666666;
 	padding-left: 25px;
 	padding-right: 25px;
 }
+
+button {
+	border: none;
+	background-color: transparent;
+	color: #666666;
+	vertical-align: middle;
+}
+
+button:hover {
+	color: #6F6F6F;
+	background-color: #F6F6F6;
+}
+
 
 .menu-items {
 	padding: 5px;
 	color: #666666;
 	cursor: default;
-}
-
-.bar-items:hover {
-	color: #717171;
-	background-color: #F6F6F6;
 }
 
 .menu-items:hover {

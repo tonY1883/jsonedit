@@ -99,7 +99,8 @@ function loadDatum(path) {
 	var pathComponents = path.split(">");
 	var index;
 	var targetObj;
-	$('#editor-content').empty();
+	var editor = $('#editor-content');
+	editor.empty().unbind();
 	index = 1;
 	targetObj = data;
 	for (var i = index; i < pathComponents.length; i++) {
@@ -112,40 +113,40 @@ function loadDatum(path) {
 		currentNodeMaxIndex = currentNode.length;
 		$.each(currentNode, function (i, o) {
 			if (isObject(o)) {
-				$('#editor-content').append("<div class=\"table-row\">" +
-											"<input class=\"key-input\" readonly value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
-											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-											"</div>");
+				editor.append("<div class=\"table-row\">" +
+							  "<input class=\"key-input\" readonly value=" + i + "> : " +
+							  "<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
+							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
+							  "</div>");
 			} else {
-				$('#editor-content').append("<div class=\"table-row\">" +
-											"<input class=\"key-input\" readonly value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
-											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-											"</div>");
+				editor.append("<div class=\"table-row\">" +
+							  "<input class=\"key-input\" readonly value=" + i + "> : " +
+							  "<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
+							  "</div>");
 			}
 
 		});
 	} else {
 		$.each(targetObj, function (i, o) {
 			if (isObject(o)) {
-				$('#editor-content').append("<div class=\"table-row\">" +
-											"<input class=\"key-input\" value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
-											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-											"</div>");
+				editor.append("<div class=\"table-row\">" +
+							  "<input class=\"key-input\" value=" + i + "> : " +
+							  "<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
+							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
+							  "</div>");
 			} else {
-				$('#editor-content').append("<div class=\"table-row\">" +
-											"<input class=\"key-input\" value=" + i + "> : " +
-											"<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
-											"<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-											"</div>");
+				editor.append("<div class=\"table-row\">" +
+							  "<input class=\"key-input\" value=" + i + "> : " +
+							  "<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
+							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
+							  "</div>");
 			}
 		});
 	}
 	if (!$('.new').length) {
-		//TODO can this be fixed not generated every time?
-		$('#editor-content').append("<div class=\"table-row\" id='new-row'>" +
+		//FIXME can this be fixed not generated every time?
+		editor.append("<div class=\"table-row\" id='new-row'>" +
 									"<button class=\"new\" ><i class=\"material-icons\" style=\"vertical-align: middle;\">add_circle</i>New...</button> " + "<ul class='menu' id='new-option'>" +
 									"<li class=\"menu-items\" id=\"new-value-button\"><a >Value</a></li>" +
 									"<li class=\"menu-items\"id=\"new-array-button\"><a >Array</a></li>" +
@@ -173,8 +174,6 @@ function loadDatum(path) {
 			}
 			newRow.insertBefore($('#new-row'));
 			reloadIndices();
-			setNotEditable();
-			setDelete();
 		});
 		$('#new-array-button').click(function () {
 			$('#new-option').hide();
@@ -194,8 +193,6 @@ function loadDatum(path) {
 			}
 			newRow.insertBefore($('#new-row'));
 			reloadIndices();
-			setNotEditable();
-			setDelete();
 		});
 
 		$('#new-object-button').click(function () {
@@ -216,8 +213,6 @@ function loadDatum(path) {
 			}
 			newRow.insertBefore($('#new-row'));
 			reloadIndices();
-			setNotEditable();
-			setDelete();
 		});
 	}
 
@@ -227,8 +222,18 @@ function loadDatum(path) {
 			saveDatum();
 		})
 	}
-	setNotEditable();
-	setDelete();
+	editor.on("keydown", '.key-input[readonly]', function () {
+		alert("Array indices cannot be modified!")
+	});
+	editor.on("keydown", '.value-input[readonly]', function () {
+		alert("Objects and arrays must be edited in their own node!")
+	});
+	editor.on("click", '.delete-row', function () {
+		$(this).parent().remove();
+		if (Array.isArray(currentNode)) {
+			reloadIndices();
+		}
+	});
 	$('#edit-button').css('visibility', 'visible');
 }
 
@@ -241,24 +246,6 @@ function reloadIndices() {
 	} else {
 		//no need to reload.
 	}
-}
-
-function setNotEditable() {
-	$('.key-input[readonly]').keydown(function () {
-		alert("Array indices cannot be modified!")
-	});
-	$('.value-input[readonly]').keydown(function () {
-		alert("Objects and arrays must be edited in their own node!")
-	})
-}
-
-function setDelete() {
-	$('.delete-row').click(function () {
-		$(this).parent().remove();
-		if (Array.isArray(currentNode)) {
-			reloadIndices();
-		}
-	})
 }
 
 function saveDatum() {
@@ -301,7 +288,6 @@ function saveDatum() {
 	});
 	//refresh tree
 	loadData(JSON.stringify(data));
-
 	alert("Content saved.")
 
 }

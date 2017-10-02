@@ -147,12 +147,12 @@ function loadDatum(path) {
 	if (!$('.new').length) {
 		//FIXME can this be fixed not generated every time?
 		editor.append("<div class=\"table-row\" id='new-row'>" +
-									"<button class=\"new\" ><i class=\"material-icons\" style=\"vertical-align: middle;\">add_circle</i>New...</button> " + "<ul class='menu' id='new-option'>" +
-									"<li class=\"menu-items\" id=\"new-value-button\"><a >Value</a></li>" +
-									"<li class=\"menu-items\"id=\"new-array-button\"><a >Array</a></li>" +
-									"<li class=\"menu-items\"id=\"new-object-button\"><a >Object</a></li>" +
-									"</ul>" +
-									"</div>");
+					  "<button class=\"new\" ><i class=\"material-icons\" style=\"vertical-align: middle;\">add_circle</i>New...</button> " + "<ul class='menu' id='new-option'>" +
+					  "<li class=\"menu-items\" id=\"new-value-button\"><a >Value</a></li>" +
+					  "<li class=\"menu-items\"id=\"new-array-button\"><a >Array</a></li>" +
+					  "<li class=\"menu-items\"id=\"new-object-button\"><a >Object</a></li>" +
+					  "</ul>" +
+					  "</div>");
 		$('.new').click(function () {
 			$('#new-option').show();
 		});
@@ -353,9 +353,8 @@ $('#setting-button').click(function () {
 	};
 	$('#save-setting').click(function () {
 		autoTypeConvert = $('#option-type-convert')[0].checked;
+		$('#modal-setting-bg').hide();
 	});
-
-
 });
 
 $('#save-string-button').click(function () {

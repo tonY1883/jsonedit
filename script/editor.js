@@ -66,6 +66,7 @@ function assembleTreeJson(object, name) {
 	result["icon"] = false;
 	//TODO find proper icons
 	if (Array.isArray(object)) {
+		result["icon"] = "img/array-s.png";
 		var ary = [];
 		var children = false;
 		$.each(object, function (i, o) {
@@ -80,6 +81,7 @@ function assembleTreeJson(object, name) {
 		}
 		return result;
 	} else if (isObject(object)) {
+		result["icon"] = "img/object-s.png";
 		var ary = [];
 		var c = 0;
 		$.each(object, function (i, o) {

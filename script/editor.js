@@ -219,7 +219,7 @@ function loadDatum(path) {
 	}
 
 	if (!$('#save-btn').length) {
-		$('#editor-content').append($('<button id="save-btn" class="save-btn">Save</button>'));
+		$('#editor-content').append($('<button id="save-btn" class="save-btn raised-button">Save</button>'));
 		$('#save-btn').click(function () {
 			saveDatum();
 		})

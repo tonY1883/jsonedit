@@ -14,7 +14,8 @@ body {
 	padding-left: 8px;
 	top: 0;
 	width: 100vw;
-	min-height: 1.2em;
+	min-height: 1.6em;
+	font-size: 1.2em;
 	vertical-align: middle;
 	box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.19), 0 6px 6px -6px rgba(0, 0, 0, 0.23);
 }
@@ -27,25 +28,28 @@ body {
 button {
 	border: none;
 	background-color: transparent;
-	color: #666666;
+	color: #2F2F2F;
 	vertical-align: middle;
 }
 
 button:hover {
-	color: #6F6F6F;
-	background-color: #F6F6F6;
+	color: #2F2F2F;
+	background-color: #DDDDDD;
 }
 
+button:active {
+	background-color: #CCCCCC;
+}
 
 .menu-items {
 	padding: 5px;
-	color: #666666;
+	color: #2F2F2F;
 	cursor: default;
 }
 
 .menu-items:hover {
-	color: #717171;
-	background-color: #F6F6F6;
+	color: #2F2F2F;
+	background-color: #DDDDDD;
 }
 
 #top-bar ul li {
@@ -110,7 +114,7 @@ main {
 
 button {
 	text-align: center;
-	padding: 5px;
+	padding: 5px 1.5rem;
 }
 
 button, input {
@@ -121,6 +125,7 @@ button, input {
 	visibility: hidden;
 	float: left;
 	width: 18%;
+	min-width: 400px;
 	border-right: 1px;
 	height: 100%;
 	overflow: auto;
@@ -139,17 +144,12 @@ button, input {
 #tree {
 	background-color: white;
 	width: 80%;
-	height: 80%;
+	height: 90%;
 	margin: auto;
 	padding: 5px;
 	text-align: left;
 	overflow: auto;
-}
-
-.jstree-default .jstree-anchor {
-	font-size: 1em;
-	height: 1em;
-	line-height: 1em;
+	font-size: 16px;
 }
 
 .jstree-default .jstree-search {
@@ -161,6 +161,7 @@ button, input {
 #editor {
 	display: inline-block;
 	width: 82%;
+	min-width: 400px;
 	height: 100%;
 	float: right;
 	overflow: auto;
@@ -177,7 +178,8 @@ button, input {
 
 .table-row {
 	display: table-row;
-	border-bottom: ridge 1px;
+	border-bottom: #B4B4B4 ridge 1px;
+	white-space: nowrap;
 }
 
 .table-cell {
@@ -191,11 +193,30 @@ textarea {
 
 }
 
+.table-row textarea {
+	min-width: 195px;
+	white-space: nowrap;
+
+}
+
 #save-btn {
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 20px;
 	display: block;
+}
+
+.raised-button:hover {
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+	background-color: #008274;
+	color: white;
+}
+
+.raised-button {
+	background-color: #009587;
+	color: white;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+	transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
 }
 
 .new {
@@ -265,5 +286,46 @@ textarea {
 	padding-left: 0;
 	margin-top: 0;
 	z-index: 20;
+
+}
+
+@media only screen and (max-width: 750px) {
+	#editor, #browser {
+		float: none;
+		display: block;
+		width: 100vw;
+	}
+
+	main {
+		flex-direction: column;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+
+	#top-bar {
+		padding-right: 125px;
+		width: 100%;
+	}
+
+	#tree {
+		width: 100%;
+
+	}
+
+	#editor-content {
+		width: 100%;
+	}
+
+	#searchbox {
+		width: 100%;
+	}
+
+	.table-row {
+		white-space: normal;
+	}
+
+	.modal-content-small {
+		width: 60vw;
+	}
 
 }

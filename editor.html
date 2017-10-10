@@ -35,7 +35,7 @@
 		</div>
 		<div class="modal" id="modal-new-json-bg">
 			<div id="modal-new-json-root" class="modal-content-small">
-				<h2>Choose a root node</h2>
+				<h2>Choose a root element</h2>
 				<label><input name="root" type="radio" id="option-ary" value="ary">Array</label><br>
 				<label><input name="root" type="radio" id="option-obj" value="obj">Object</label>
 				<p align="right">
@@ -64,22 +64,34 @@
 				<li>
 					<button id="load-json-button" class="bar-items">Load...</button>
 					<ul>
-						<li class="menu-items"><a id="load-file-button">From JSON File</a></li>
-						<li class="menu-items"><a id="load-string-button">From JSON String</a></li>
+						<a id="load-file-button">
+							<li class="menu-items">From JSON File</li>
+						</a>
+						<a id="load-string-button">
+							<li class="menu-items">From JSON String</li>
+						</a>
 					</ul>
 				</li>
 				<li id="save-json-button">
 					<button class="bar-items">Save...</button>
 					<ul>
-						<li class="menu-items"><a id="save-file-button">As JSON File</a></li>
-						<li class="menu-items"><a id="save-string-button">As JSON String</a></li>
+						<a id="save-file-button">
+							<li class="menu-items">As JSON File</li>
+						</a>
+						<a id="save-string-button">
+							<li class="menu-items">As JSON String</li>
+						</a>
 					</ul>
 				</li>
 				<li id="edit-button">
 					<button class="bar-items">Edit</button>
 					<ul>
-						<li class="menu-items"><a id="copy-button">Copy current node</a></li>
-						<li class="menu-items"><a id="paste-button">Paste</a></li>
+						<a id="copy-button">
+							<li class="menu-items">Copy current object</li>
+						</a>
+						<a id="paste-button">
+							<li class="menu-items">Paste object</li>
+						</a>
 					</ul>
 				</li>
 			</ul>

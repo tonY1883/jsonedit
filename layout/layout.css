@@ -121,6 +121,10 @@ button, input {
 	font-size: 1em;
 }
 
+input:focus {
+	outline: none;
+}
+
 #browser {
 	visibility: hidden;
 	float: left;
@@ -132,6 +136,11 @@ button, input {
 	text-align: center;
 	box-shadow: 3px 0 6px -3px rgba(0, 0, 0, 0.16), 3px 0 6px -3px rgba(0, 0, 0, 0.23);
 
+}
+
+#browser input {
+	border: none;
+	border-bottom: 1px solid #757575;
 }
 
 #searchbox {

@@ -6,6 +6,7 @@ var currentNodePath;
 var autoTypeConvert = true;
 
 var fname;
+var copiedNode
 
 function loadFile(type) {
 	var fileSelector = $('<input type="file">');
@@ -250,6 +251,33 @@ function reloadIndices() {
 	}
 }
 
+function copyDatum() {
+	copiedNode = JSON.stringify(currentNode);
+	alert("Current element copied.")
+}
+
+function pasteDatum() {
+	if (!(!copiedNode)) {
+		var newRow;
+		if (Array.isArray(currentNode)) {
+			newRow = $("<div class=\"table-row\">" +
+					   "<input class=\"key-input\" readonly value=\"\"> : " +
+					   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">" + copiedNode + "</textarea>" +
+					   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
+					   "</div>");
+		} else {
+			newRow = $("<div class=\"table-row\">" +
+					   "<input class=\"key-input\" > : " +
+					   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">" + copiedNode + "</textarea>" +
+					   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
+					   "</div>");
+		}
+		newRow.insertBefore($('#new-row'));
+		reloadIndices();
+	}
+
+}
+
 function saveDatum() {
 	var currentNodeOld = JSON.parse(JSON.stringify(currentNode));//deep cloning (JSON compatible only)
 	var oldKeys = Object.keys(currentNodeOld);
@@ -383,6 +411,14 @@ $('#load-string-button').click(function () {
 		loadData($('#string-input').val());
 		$('#modal-string-bg').hide();
 	});
+});
+
+$('#copy-button').click(function () {
+	copyDatum();
+});
+
+$('#paste-button').click(function () {
+	pasteDatum();
 });
 
 $("#searchbox").keyup(function () {

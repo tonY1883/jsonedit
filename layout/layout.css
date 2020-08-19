@@ -67,6 +67,26 @@ button:active {
 	padding: 0
 }
 
+.type-icon {
+	margin: 0 0.25em;
+	padding: 0;
+	vertical-align: top;
+	text-align: center;
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	background-position: center center;
+	background-size: auto;
+}
+
+.type-icon-array {
+	background-image: url('../img/array-s.png');
+}
+
+.type-icon-object {
+	background-image: url('../img/object-s.png');
+}
+
 .menu {
 	list-style: none;
 	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
@@ -161,10 +181,39 @@ input:focus {
 	font-size: 16px;
 }
 
-.jstree-default .jstree-search {
-	font-style: normal;
-	color: black;
-	font-weight: normal;
+.tree-icon {
+	margin: 0;
+	vertical-align: center;
+}
+
+.tree-label {
+	max-height: 1em;
+	user-select: none;
+	cursor: pointer;
+}
+
+.tree-label-selected {
+	background-color: #003182;
+	color: white;
+}
+
+.tree-node-list {
+	display: none;
+	list-style-type: none;
+	margin-left: 0.5em;
+	padding-left: 1em;
+	border-left: #CFCFCF solid 1px;
+}
+
+.caret {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	text-align: center;
+}
+
+.active-tree {
+	display: block;
 }
 
 #editor {

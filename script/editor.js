@@ -6,15 +6,20 @@ var currentNodePath;
 var autoTypeConvert = true;
 
 var fname;
-var copiedNode
+var copiedNode;
+
+var searchString = '';
+
+const DELIMITER = String.fromCharCode(7);
 
 function loadFile(type) {
-	var fileSelector = $('<input type="file">');
+	let fileSelector = document.createElement('input');
+	fileSelector.type = 'file';
 	if (type) {
-		fileSelector.attr('accept', type);
+		fileSelector.setAttribute('accept', type);
 	}
-	fileSelector.change(function () {
-		var file = fileSelector[0].files[0];
+	fileSelector.addEventListener('change', () => {
+		let file = fileSelector.files[0];
 		fname = file.name;
 		var reader = new FileReader();
 		reader.onload = function (e) {
@@ -31,82 +36,110 @@ function loadData(string) {
 	try {
 		data = JSON.parse(string);
 	} catch (err) {
-		alert("Your JSON contains syntax errors!\n" + "Fail to parse JSON: " + err.message);
+		alert('Your JSON contains syntax errors!\n' + 'Fail to parse JSON: ' + err.message);
 		return;
 	}
-	$('#save-json-button').css('visibility', 'visible');
-	$('#browser').css('visibility', 'visible');
+	document.querySelector('#save-json-button').style.visibility = 'visible';
+	document.querySelector('#browser').style.visibility = 'visible';
 	if (fname !== undefined) {
-		$('title').text("JSONEdit: " + fname);
+		document.querySelector('title').innerText = ('JSONEdit: ' + fname);
 	} else {
-		fname = "JSON.json";
+		fname = 'JSON.json';
 	}
-	//assemble tree view
-	var treeObj = {};
-	var treePlugins = [
-		"search"
-	];
-	var treeSearchModule = {
-		"case_insensitive": true,
-		"show_only_matches": true
-	};
-	treeObj["core"] = {};
-	treeObj.core["data"] = assembleTreeJson(data);
-	treeObj["plugins"] = treePlugins;
-	treeObj["search"] = treeSearchModule;
-	$('#tree').jstree("destroy").jstree(treeObj);
-	$('#editor-content').empty();
+	document.querySelector('#tree').innerHTML = '';
+	document.querySelector('#editor-content').innerHTML = '';
+	assembleTreeDisplay(data, fname);
 }
 
-function assembleTreeJson(object, name) {
-	var result = {};
-	if (name === undefined) {
-		name = object.constructor.name
+function assembleTreeDisplay(object, name) {
+	document.querySelector('#tree').appendChild(getTreeNodeHTML(object, name));
+	document.querySelectorAll('.caret').forEach((element) => {
+		element.addEventListener('click', (e) => {
+			let item = e.target.parentElement;
+			item.querySelector('.tree-node-list')?.classList.toggle('active-tree');
+			if (item.querySelector('.caret').innerHTML === '+') {
+				item.querySelector('.caret').innerHTML = '-';
+			} else if (item.querySelector('.caret').innerHTML === '-') {
+				item.querySelector('.caret').innerHTML = '+';
+			}
+		});
+	});
+	document.querySelectorAll('.tree-label').forEach((element) => {
+		element.addEventListener('click', (e) => {
+			e.stopPropagation();
+			document.querySelectorAll('.tree-label-selected').forEach((e2) => e2.classList.toggle('tree-label-selected'));
+			e.target.classList.toggle('tree-label-selected');
+			loadDatum(e.target.dataset.name);
+		});
+	});
+}
+
+function refreshTree() {
+	if (!!data) {
+		loadData(JSON.stringify(data));
 	}
-	result['text'] = name;
-	result["icon"] = false;
-	//TODO find proper icons
+}
+
+function getTreeNodeHTML(object, name) {
+	let node = document.createElement('li');
+	//TODO display attributes with respective icons
+	let list = [];
 	if (Array.isArray(object)) {
-		result["icon"] = "img/array-s.png";
-		var ary = [];
-		var children = false;
-		$.each(object, function (i, o) {
-			var uname = i.toString();
-			if (isObject(o) || Array.isArray(o)) {
-				children = true;
-				ary[i] = assembleTreeJson(o, uname);
+		let length = 0;
+		object.forEach((value, key) => {
+			if (isObject(value) || Array.isArray(value)) {
+				let child = getTreeNodeHTML(value, name + DELIMITER + key);
+				if (child !== undefined) {
+					list.push(child);
+					length++;
+				}
 			}
 		});
-		if (children) {
-			result['children'] = ary;
+		if (length > 0) {
+			node.insertAdjacentHTML('beforeend', `<span class='caret'>+</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+		} else {
+			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 		}
-		return result;
 	} else if (isObject(object)) {
-		result["icon"] = "img/object-s.png";
-		var ary = [];
-		var c = 0;
-		$.each(object, function (i, o) {
-			if (isObject(o) || Array.isArray(o)) {
-				ary[c] = assembleTreeJson(o, i);
-				c++;
+		let entries = Object.entries(object);
+		let length = 0;
+		for (const [key, value] of entries) {
+			if (isObject(value) || Array.isArray(value)) {
+				let child = getTreeNodeHTML(value, name + DELIMITER + key);
+				if (child !== undefined) {
+					list.push(child);
+					length++;
+				}
 			}
-		});
-		result['children'] = ary;
-		return result;
+		}
+		if (length > 0) {
+			node.insertAdjacentHTML('beforeend', `<span class='caret'>+</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+		} else {
+			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+		}
+	}
+	if (name.includes(searchString) || list.length > 0) {
+		let nodeList = document.createElement('ul');
+		nodeList.classList.add('tree-node-list');
+		for (let i = 0; i < list.length; i++) {
+			nodeList.appendChild(list[i]);
+		}
+		node.appendChild(nodeList);
+		return node;
 	} else {
-		return null;
+		return undefined;
 	}
 }
 
 function loadDatum(path) {
-	var pathComponents = path.split(">");
-	var index;
-	var targetObj;
-	var editor = $('#editor-content');
-	editor.empty().unbind();
+	let pathComponents = path.split(DELIMITER);
+	let index;
+	let targetObj;
+	let editor = document.querySelector('#editor-content');
+	editor.innerHTML = '';
 	index = 1;
 	targetObj = data;
-	for (var i = index; i < pathComponents.length; i++) {
+	for (let i = index; i < pathComponents.length; i++) {
 		targetObj = targetObj[pathComponents[i]];
 	}
 	currentNode = targetObj;
@@ -114,138 +147,162 @@ function loadDatum(path) {
 	//TODO reduce repeated code
 	if (Array.isArray(currentNode)) {
 		currentNodeMaxIndex = currentNode.length;
-		$.each(currentNode, function (i, o) {
+		currentNode.forEach((o, i) => {
 			if (isObject(o)) {
-				editor.append("<div class=\"table-row\">" +
-							  "<input class=\"key-input\" readonly value=" + i + "> : " +
-							  "<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
-							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-							  "</div>");
+				editor.insertAdjacentHTML('beforeend', `
+														<div class="table-row">
+															<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
+															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
+														</div>`
+				);
 			} else {
-				editor.append("<div class=\"table-row\">" +
-							  "<input class=\"key-input\" readonly value=" + i + "> : " +
-							  "<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
-							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-							  "</div>");
+				editor.insertAdjacentHTML('beforeend', `
+														<div class="table-row">
+															<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" value=${o} id="id-input">${o}</textarea>
+															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
+														</div>`
+				);
 			}
-
 		});
 	} else {
-		$.each(targetObj, function (i, o) {
+		for (let [i, o] of Object.entries(currentNode)) {
 			if (isObject(o)) {
-				editor.append("<div class=\"table-row\">" +
-							  "<input class=\"key-input\" value=" + i + "> : " +
-							  "<textarea class=\"table-cell value-input\" readonly value=" + JSON.stringify(o) + " id=\"id-input\">" + JSON.stringify(o) + "</textarea>" +
-							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-							  "</div>");
+				editor.insertAdjacentHTML('beforeend', `
+														<div class="table-row">
+															<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
+															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
+														</div>`
+				);
 			} else {
-				editor.append("<div class=\"table-row\">" +
-							  "<input class=\"key-input\" value=" + i + "> : " +
-							  "<textarea class=\"table-cell value-input\" value=" + o + " id=\"id-input\">" + o + "</textarea>" +
-							  "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-							  "</div>");
+				editor.insertAdjacentHTML('beforeend', `
+														<div class="table-row">
+															<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" value=${o} id="id-input">${o}</textarea>
+															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
+														</div>`
+				);
 			}
-		});
+		}
 	}
-	if (!$('.new').length) {
+	if (!document.querySelectorAll('.new').length) {
 		//FIXME can this be fixed not generated every time?
-		editor.append("<div class=\"table-row\" id='new-row'>" +
-					  "<button class=\"new\" ><i class=\"material-icons\" style=\"vertical-align: middle;\">add_circle</i>New...</button> " + "<ul class='menu' id='new-option'>" +
-					  "<li class=\"menu-items\" id=\"new-value-button\"><a >Value</a></li>" +
-					  "<li class=\"menu-items\"id=\"new-array-button\"><a >Array</a></li>" +
-					  "<li class=\"menu-items\"id=\"new-object-button\"><a >Object</a></li>" +
-					  "</ul>" +
-					  "</div>");
-		$('.new').click(function () {
-			$('#new-option').show();
-		});
-		$('#new-value-button').click(function () {
-			$('#new-option').hide();
-			var newRow;
+		editor.insertAdjacentHTML('beforeend', `
+			<div class='table-row' id='new-row'>
+				<button class='new'>
+					<i class='material-icons' style='vertical-align: middle;'>add_circle</i>
+					New...
+				</button>
+				<ul class='menu' id='new-option'>
+					<li class='menu-items' id='new-value-button'><a>Value</a></li>
+					<li class='menu-items' id='new-array-button'><a>Array</a></li>
+					<li class='menu-items' id='new-object-button'><a>Object</a></li>
+				</ul>
+			</div>
+		`);
+		document.querySelector('#new-value-button').addEventListener('click', () => {
+			document.querySelector('#new-option').style.display = 'none';
+			let newRow;
 			if (Array.isArray(currentNode)) {
-				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" readonly value=\"\"> : " +
-						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
-						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-						   "</div>");
+				newRow = `
+					<div class='table-row'><input class='key-input' readonly value=''> :
+						<textarea class='table-cell value-input' id='id-input'> </textarea>
+						<button class='delete-row'>
+							<i class='material-icons' style='vertical-align: middle;'>remove_circle</i>Delete
+						</button>
+					</div>
+				`;
 			} else {
-				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" > : " +
-						   "<textarea class=\"table-cell value-input\"  id=\"id-input\"> </textarea>" +
-						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-						   "</div>");
+				newRow = `
+					<div class='table-row'><input class='key-input' value=''> :
+						<textarea class='table-cell value-input' id='id-input'> </textarea>
+						<button class='delete-row'>
+							<i class='material-icons' style='vertical-align: middle;'>remove_circle</i>Delete
+						</button>
+					</div>
+				`;
 			}
-			newRow.insertBefore($('#new-row'));
+			document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
 			reloadIndices();
 		});
-		$('#new-array-button').click(function () {
-			$('#new-option').hide();
-			var newRow;
+		document.querySelector('#new-array-button').addEventListener('click', () => {
+			document.querySelector('#new-option').style.display = 'none';
+			let newRow;
 			if (Array.isArray(currentNode)) {
-				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" readonly value=\"\"> : " +
-						   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">[]</textarea>" +
-						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-						   "</div>");
+				newRow = `
+					<div class='table-row'><input class='key-input' readonly value=''> :
+						<textarea class='table-cell value-input' readonly id='id-input'>[]</textarea>
+						<button class='delete-row'>
+							<i class='material-icons' style='vertical-align: middle;'>remove_circle</i>Delete
+						</button>
+					</div>
+				`;
 			} else {
-				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" > : " +
-						   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">[]</textarea>" +
-						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-						   "</div>");
+				newRow = `
+					<div class='table-row'><input class='key-input' value=''> :
+						<textarea class='table-cell value-input' readonly id='id-input'>[]</textarea>
+						<button class='delete-row'>
+							<i class='material-icons' style='vertical-align: middle;'>remove_circle</i>Delete
+						</button>
+					</div>
+				`;
 			}
-			newRow.insertBefore($('#new-row'));
+			document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
 			reloadIndices();
 		});
+		document.querySelector('#new-object-button').addEventListener('click', () => {
+			document.querySelector('#new-option').style.display = 'none';
+			let newRow;
+			if (Array.isArray(currentNode)) {
+				newRow = `
+					<div class='table-row'><input class='key-input' readonly value=''> :
+						<textarea class='table-cell value-input' readonly id='id-input'>{}</textarea>
+						<button class='delete-row'>
+							<i class='material-icons' style='vertical-align: middle;'>remove_circle</i>Delete
+						</button>
+					</div>
+				`;
+			} else {
+				newRow = `
+					<div class='table-row'><input class='key-input' value=''> :
+						<textarea class='table-cell value-input' readonly id='id-input'>{}</textarea>
+						<button class='delete-row'>
+							<i class='material-icons' style='vertical-align: middle;'>remove_circle</i>Delete
+						</button>
+					</div>
+				`;
+			}
+			document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
+			reloadIndices();
+		});
+		document.querySelectorAll('.new').forEach(e => e.addEventListener('click', () => {
+			document.querySelector('#new-option').style.display = 'block';
+		}));
 
-		$('#new-object-button').click(function () {
-			$('#new-option').hide();
-			var newRow;
-			if (Array.isArray(currentNode)) {
-				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" readonly value=\"\"> : " +
-						   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">{}</textarea>" +
-						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-						   "</div>");
-			} else {
-				newRow = $("<div class=\"table-row\">" +
-						   "<input class=\"key-input\" > : " +
-						   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">{}</textarea>" +
-						   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-						   "</div>");
-			}
-			newRow.insertBefore($('#new-row'));
-			reloadIndices();
-		});
 	}
-
-	if (!$('#save-btn').length) {
-		$('#editor-content').append($('<button id="save-btn" class="save-btn raised-button">Save</button>'));
-		$('#save-btn').click(function () {
+	if (!!!document.querySelector('#save-btn')) {
+		document.querySelector('#editor-content').insertAdjacentHTML('beforeend', '<button id="save-btn" class="save-btn raised-button">Save</button>');
+		document.querySelector('#save-btn').addEventListener('click', () => {
 			saveDatum();
-		})
+		});
 	}
-	editor.on("keydown", '.key-input[readonly]', function () {
-		alert("Array indices cannot be modified!")
-	});
-	editor.on("keydown", '.value-input[readonly]', function () {
-		alert("Objects and arrays must be edited in their own node!")
-	});
-	editor.on("click", '.delete-row', function () {
-		$(this).parent().remove();
+	document.querySelectorAll('.key-input[readonly]').forEach(e => e.addEventListener('keydown', () =>
+		alert('Array indices cannot be modified!')
+	));
+	document.querySelectorAll('.value-input[readonly]').forEach(e => e.addEventListener('keydown', () =>
+		alert('Objects and arrays must be edited in their own node!')
+	));
+	document.querySelectorAll('.delete-row').forEach(e => e.addEventListener('click', (e) => {
+		e.target.parentNode.remove();
 		if (Array.isArray(currentNode)) {
 			reloadIndices();
 		}
-	});
-	$('#edit-button').css('visibility', 'visible');
+	}));
+	document.querySelector('#edit-button').style.visibility = 'visible';
 }
 
 function reloadIndices() {
 	if (Array.isArray(currentNode)) {
-		var keys = $('.key-input');
-		$.each(keys, function (i, o) {
-			o.value = i;
-		});
+		var keys = document.querySelectorAll('.key-input');
+		keys.forEach((o, i) => o.value = i);
 	} else {
 		//no need to reload.
 	}
@@ -253,41 +310,47 @@ function reloadIndices() {
 
 function copyDatum() {
 	copiedNode = JSON.stringify(currentNode);
-	alert("Current element copied.")
+	alert('Current element copied.');
 }
 
 function pasteDatum() {
-	if (!(!copiedNode)) {
-		var newRow;
+	if (!!copiedNode) {
+		let newRow;
 		if (Array.isArray(currentNode)) {
-			newRow = $("<div class=\"table-row\">" +
-					   "<input class=\"key-input\" readonly value=\"\"> : " +
-					   "<textarea class=\"table-cell value-input\"  readonly id=\"id-input\">" + copiedNode + "</textarea>" +
-					   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-					   "</div>");
+			newRow = `
+			<div class='table-row'>
+				<input class='key-input' readonly value=''> : 
+				<textarea class='table-cell value-input' readonly id='id-input'>
+					${copiedNode}
+				</textarea>
+				<button class='delete-row'><i class='material-icons'style='vertical-align: middle;'>remove_circle</i>Delete</button>
+			</div>`;
 		} else {
-			newRow = $("<div class=\"table-row\">" +
-					   "<input class=\"key-input\" > : " +
-					   "<textarea class=\"table-cell value-input\" readonly id=\"id-input\">" + copiedNode + "</textarea>" +
-					   "<button class='delete-row'><i class=\"material-icons\" style=\"vertical-align: middle;\">remove_circle</i>Delete</button>" +
-					   "</div>");
+			newRow = `
+			<div class='table-row'>
+				<input class='key-input'> : 
+				<textarea class='table-cell value-input' readonly id='id-input'>
+					${copiedNode}
+				</textarea>
+				<button class='delete-row'><i class='material-icons'style='vertical-align: middle;'>remove_circle</i>Delete</button>
+			</div>`;
 		}
-		newRow.insertBefore($('#new-row'));
+		document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
 		reloadIndices();
 	}
 
 }
 
 function saveDatum() {
-	var currentNodeOld = JSON.parse(JSON.stringify(currentNode));//deep cloning (JSON compatible only)
-	var oldKeys = Object.keys(currentNodeOld);
-	var keys = $('.key-input');
-	var newKeys = [];
-	var values = $('.value-input');
-	$.each(keys, function (i, o) {
+	let currentNodeOld = JSON.parse(JSON.stringify(currentNode));//deep cloning (JSON compatible only)
+	let oldKeys = Object.keys(currentNodeOld);
+	let keys = document.querySelectorAll('.key-input');
+	let newKeys = [];
+	let values = document.querySelectorAll('.value-input');
+	keys.forEach((o, i) => {
 		newKeys.push(o.value);
-		if ($(values[i]).prop('readonly')) {
-			if ($.inArray(o.value, oldKeys) > -1) {
+		if (values[i].readOnly) {
+			if (oldKeys.includes(o.value)) {
 				//do nothing -- editing prohibited
 			} else {
 				//okay, that's new
@@ -297,9 +360,9 @@ function saveDatum() {
 			if (autoTypeConvert) {
 				if (isNumber(values[i].value)) {
 					currentNode[o.value] = Number(values[i].value);
-				} else if (values[i].value === "true") {
+				} else if (values[i].value === 'true') {
 					currentNode[o.value] = true;
-				} else if (values[i].value === "false") {
+				} else if (values[i].value === 'false') {
 					currentNode[o.value] = false;
 				} else {
 					currentNode[o.value] = values[i].value;
@@ -311,14 +374,14 @@ function saveDatum() {
 
 	});
 	//remove unwanted properties
-	$.each(oldKeys, function (i, o) {
-		if ($.inArray(o, newKeys) < 0) {
-			delete currentNode[o]
+	oldKeys.forEach((o) => {
+		if (!newKeys.includes(o)) {
+			delete currentNode[o];
 		}
 	});
 	//refresh tree
 	loadData(JSON.stringify(data));
-	alert("Content saved.")
+	alert('Content saved.');
 
 }
 
@@ -334,102 +397,105 @@ function saveFile() {
 	var odata = JSON.stringify(data);
 	var link = document.createElement('a');
 	link.setAttribute('download', fname);
-	link.href = window.URL.createObjectURL(new Blob([odata], {type: "application/json"}));
+	link.href = window.URL.createObjectURL(new Blob([odata], {type: 'application/json'}));
 	document.body.appendChild(link);
-	window.requestAnimationFrame(function () {
+	window.requestAnimationFrame(() => {
 		link.click();
 		document.body.removeChild(link);
 	});
 }
 
-$('#save-file-button').click(function () {
+document.querySelector('#save-file-button').addEventListener('click', () => {
 	saveFile();
 });
 
-$('#load-file-button').click(function () {
+document.querySelector('#load-file-button').addEventListener('click', () => {
 	loadFile('.json');
-
 });
 
-$('#new-json-button').click(function () {
+document.querySelector('#new-json-button').addEventListener('click', () => {
 	if (data !== undefined) {
-		if (!confirm("Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?")) {
+		if (!confirm('Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?')) {
 			return;
 		}
 	}
-	$('#modal-new-json-bg').show();
+	document.querySelector('#modal-new-json-bg').style.display = 'block';
 	window.onclick = function (event) {
-		if (event.target == $('#modal-new-json-bg')[0]) {
-			$('#modal-new-json-bg').hide();
+		if (event.target == document.querySelector('#modal-new-json-bg')) {
+			document.querySelector('#modal-new-json-bg').style.display = 'none';
 		}
 	};
-	$('#new-json').click(function () {
-		if ($('#option-ary')[0].checked === true) {
-			loadData("[]");
-			$('#modal-new-json-bg').hide();
-		} else if ($('#option-obj')[0].checked === true) {
-			loadData("{}");
-			$('#modal-new-json-bg').hide();
+	document.querySelector('#new-json').addEventListener('click', () => {
+		if (document.querySelector('#option-ary').checked === true) {
+			loadData('[]');
+			document.querySelector('#modal-new-json-bg').style.display = 'none';
+		} else if (document.querySelector('#option-obj').checked === true) {
+			loadData('{}');
+			document.querySelector('#modal-new-json-bg').style.display = 'none';
 		}
 	});
 });
 
-$('#setting-button').click(function () {
-	$('#modal-setting-bg').show();
+document.querySelector('#setting-button').addEventListener('click', () => {
+	document.querySelector('#modal-setting-bg').style.display = 'block';
 	window.onclick = function (event) {
-		if (event.target == $('#modal-setting-bg')[0]) {
-			$('#modal-setting-bg').hide();
+		if (event.target === document.querySelector('#modal-setting-bg')) {
+			document.querySelector('#modal-setting-bg').style.display = 'none';
 		}
 	};
-	$('#save-setting').click(function () {
-		autoTypeConvert = $('#option-type-convert')[0].checked;
-		$('#modal-setting-bg').hide();
+	document.querySelector('#save-setting').addEventListener('click', () => {
+		autoTypeConvert = document.querySelector('#option-type-convert').checked;
+		document.querySelector('#modal-setting-bg').style.display = 'none';
 	});
 });
 
-$('#save-string-button').click(function () {
-	$('#modal-string-out-bg').show().click(function (e) {
-		$(this).hide();
-	}).children().click(function (e) {
-		return false;
+document.querySelector('#save-string-button').addEventListener('click', () => {
+	let modalBg = document.querySelector('#modal-string-out-bg');
+	modalBg.style.display = 'block';
+	modalBg.addEventListener('click', function (e) {
+		e.target.style.display = 'none';
 	});
-	$('#string-output').val(JSON.stringify(data)).focus().select();
-	$('#copy-string').click(function () {
-		$('#string-output').focus().select();
-		document.execCommand("copy");
-		alert("Output JSON copied to your clipboard.");
-	});
-});
-
-$('#load-string-button').click(function () {
-	$('#modal-string-bg').show().click(function (e) {
-		$(this).hide();
-	}).children().click(function (e) {
-		return false;
-	});
-	$('#load-string').click(function () {
-		loadData($('#string-input').val());
-		$('#modal-string-bg').hide();
+	modalBg.childNodes.forEach(node => node.addEventListener('click', (e) => {
+		e.stopPropagation();
+	}));
+	let output = document.querySelector('#string-output');
+	output.value = JSON.stringify(data);
+	output.focus();
+	output.select();
+	document.querySelector('#copy-string').addEventListener('click', () => {
+		let output = document.querySelector('#string-output');
+		output.focus();
+		output.select();
+		document.execCommand('copy');
+		alert('Output JSON copied to your clipboard.');
 	});
 });
 
-$('#copy-button').click(function () {
+document.querySelector('#load-string-button').addEventListener('click', () => {
+	let modalBg = document.querySelector('#modal-string-bg');
+	modalBg.style.display = 'block';
+	modalBg.addEventListener('click', function (e) {
+		e.target.style.display = 'none';
+	});
+	modalBg.childNodes.forEach(node => node.addEventListener('click', (e) => {
+		e.stopPropagation();
+	}));
+	document.querySelector('#load-string').addEventListener('click', () => {
+		loadData(document.querySelector('#string-input').value);
+		document.querySelector('#modal-string-bg').style.display = 'none';
+	});
+});
+
+document.querySelector('#copy-button').addEventListener('click', () => {
 	copyDatum();
 });
 
-$('#paste-button').click(function () {
+document.querySelector('#paste-button').addEventListener('click', () => {
 	pasteDatum();
 });
 
-$("#searchbox").keyup(function () {
-	var searchString = $(this).val();
-	$('#tree').jstree('search', searchString);
-});
-
-$(document).on('click', '.jstree-anchor', function (e) {
-	var anchorId = $(this).parent().attr('id');
-	var clickId = anchorId.substring(anchorId.indexOf('_') + 1, anchorId.length);
-	//$('#tree').jstree().get_path($('#tree').jstree("get_selected", true)[0], ' > ');
-	loadDatum($('#tree').jstree().get_path($('#tree').jstree("get_selected", true)[0], '>'));
+document.querySelector('#searchbox').addEventListener('keyup', (e) => {
+	searchString = e.target.value;
+	refreshTree();
 });
 

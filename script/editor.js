@@ -82,17 +82,14 @@ function refreshTree() {
 
 function getTreeNodeHTML(object, name) {
 	let node = document.createElement('li');
-	//TODO display attributes with respective icons
 	let list = [];
 	if (Array.isArray(object)) {
 		let length = 0;
 		object.forEach((value, key) => {
-			if (isObject(value) || Array.isArray(value)) {
-				let child = getTreeNodeHTML(value, name + DELIMITER + key);
-				if (child !== undefined) {
-					list.push(child);
-					length++;
-				}
+			let child = getTreeNodeHTML(value, name + DELIMITER + key);
+			if (child !== undefined) {
+				list.push(child);
+				length++;
 			}
 		});
 		if (length > 0) {
@@ -104,12 +101,10 @@ function getTreeNodeHTML(object, name) {
 		let entries = Object.entries(object);
 		let length = 0;
 		for (const [key, value] of entries) {
-			if (isObject(value) || Array.isArray(value)) {
-				let child = getTreeNodeHTML(value, name + DELIMITER + key);
-				if (child !== undefined) {
-					list.push(child);
-					length++;
-				}
+			let child = getTreeNodeHTML(value, name + DELIMITER + key);
+			if (child !== undefined) {
+				list.push(child);
+				length++;
 			}
 		}
 		if (length > 0) {
@@ -117,6 +112,12 @@ function getTreeNodeHTML(object, name) {
 		} else {
 			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 		}
+	} else if (isNumber(object)) {
+		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-number type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+	} else if (object === 'true' || object === 'false') {
+		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-bool type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+	} else {
+		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-string type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 	}
 	if (name.includes(searchString) || list.length > 0) {
 		let nodeList = document.createElement('ul');
@@ -141,6 +142,10 @@ function loadDatum(path) {
 	targetObj = data;
 	for (let i = index; i < pathComponents.length; i++) {
 		targetObj = targetObj[pathComponents[i]];
+	}
+	if (!isObject(targetObj) && !Array.isArray(targetObj)) {
+		pathComponents.pop();
+		return loadDatum(pathComponents.join(DELIMITER));
 	}
 	currentNode = targetObj;
 	currentNodePath = path;
@@ -371,7 +376,6 @@ function saveDatum() {
 				currentNode[o.value] = values[i].value;
 			}
 		}
-
 	});
 	//remove unwanted properties
 	oldKeys.forEach((o) => {

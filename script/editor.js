@@ -114,7 +114,7 @@ function getTreeNodeHTML(object, name) {
 		}
 	} else if (isNumber(object)) {
 		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-number type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
-	} else if (object === 'true' || object === 'false') {
+	} else if (object === true || object === false) {
 		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-bool type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 	} else {
 		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-string type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);

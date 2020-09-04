@@ -174,14 +174,14 @@ function loadDatum(path) {
 			if (isObject(o)) {
 				editor.insertAdjacentHTML('beforeend', `
 														<div class="table-row">
-															<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
+															<input class="key-input" value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
 															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
 														</div>`
 				);
 			} else {
 				editor.insertAdjacentHTML('beforeend', `
 														<div class="table-row">
-															<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" value=${o} id="id-input">${o}</textarea>
+															<input class="key-input" value=${i}> : <textarea class="table-cell value-input" value=${o} id="id-input">${o}</textarea>
 															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
 														</div>`
 				);
@@ -394,7 +394,7 @@ function isObject(obj) {
 }
 
 function isNumber(n) {
-	return !isNaN(parseFloat(n)) && isFinite(n);
+	return typeof n === "number";
 }
 
 function saveFile() {

@@ -346,6 +346,36 @@ function pasteDatum() {
 
 }
 
+function clearNode(node){
+	if (Array.isArray(node)) {
+		let length = 0;
+		node.forEach((value, key) => {
+			if (isObject(value)|| Array.isArray(value)){
+				clearNode(node[key])
+			} else if (isNumber(node[key])) {
+				node[key] = 0;
+			} else if (node[key] === true || node[key] === false) {
+				node[key] = false;
+			} else {
+				node[key] = "";
+			}
+		});
+	} else if (isObject(node)) {
+		let entries = Object.entries(node);
+		for (const [key, value] of entries) {
+			if (isObject(value)|| Array.isArray(value)){
+				clearNode(node[key])
+			} else if (isNumber(node[key])) {
+				node[key] = 0;
+			} else if (node[key] === true || node[key] === false) {
+				node[key] = false;
+			} else {
+				node[key] = "";
+			}
+		}
+	}
+}
+
 function saveDatum() {
 	let currentNodeOld = JSON.parse(JSON.stringify(currentNode));//deep cloning (JSON compatible only)
 	let oldKeys = Object.keys(currentNodeOld);
@@ -496,6 +526,13 @@ document.querySelector('#copy-button').addEventListener('click', () => {
 
 document.querySelector('#paste-button').addEventListener('click', () => {
 	pasteDatum();
+});
+
+document.querySelector('#clear-button').addEventListener('click', () => {
+	if (confirm("Are you sure you want to clear all JSON values?\nAll values in the current editing JSON will be removed.")){
+		clearNode(currentNode);
+		loadData(JSON.stringify(data));
+	}
 });
 
 document.querySelector('#searchbox').addEventListener('keyup', (e) => {

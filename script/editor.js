@@ -52,7 +52,10 @@ function loadData(string) {
 }
 
 function assembleTreeDisplay(object, name) {
-	document.querySelector('#tree').appendChild(getTreeNodeHTML(object, name));
+	let tree = getTreeNodeHTML(object, name);
+	if (tree){
+		document.querySelector('#tree').appendChild(tree);
+	}
 	document.querySelectorAll('.caret').forEach((element) => {
 		element.addEventListener('click', (e) => {
 			let item = e.target.parentElement;
@@ -93,7 +96,7 @@ function getTreeNodeHTML(object, name) {
 			}
 		});
 		if (length > 0) {
-			node.insertAdjacentHTML('beforeend', `<span class='caret'>+</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+			node.insertAdjacentHTML('beforeend', `<span class='caret'>${searchString.length>0?'-':'+'}</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 		} else {
 			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 		}
@@ -108,7 +111,7 @@ function getTreeNodeHTML(object, name) {
 			}
 		}
 		if (length > 0) {
-			node.insertAdjacentHTML('beforeend', `<span class='caret'>+</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+			node.insertAdjacentHTML('beforeend', `<span class='caret'>${searchString.length>0?'-':'+'}</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 		} else {
 			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 		}
@@ -119,9 +122,12 @@ function getTreeNodeHTML(object, name) {
 	} else {
 		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-string type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
 	}
-	if (name.includes(searchString) || list.length > 0) {
+	if (list.length > 0 || (searchString.length === 0 || name.toLowerCase().includes(searchString.toLowerCase()))) {
 		let nodeList = document.createElement('ul');
 		nodeList.classList.add('tree-node-list');
+		if (searchString.length > 0 && name.split(DELIMITER).pop().toLowerCase().includes(searchString.toLowerCase())){
+			nodeList.classList.add('active-tree')
+		}
 		for (let i = 0; i < list.length; i++) {
 			nodeList.appendChild(list[i]);
 		}

@@ -53,7 +53,7 @@ function loadData(string) {
 
 function assembleTreeDisplay(object, name) {
 	let tree = getTreeNodeHTML(object, name);
-	if (tree){
+	if (tree) {
 		document.querySelector('#tree').appendChild(tree);
 	}
 	document.querySelectorAll('.caret').forEach((element) => {
@@ -70,7 +70,8 @@ function assembleTreeDisplay(object, name) {
 	document.querySelectorAll('.tree-label').forEach((element) => {
 		element.addEventListener('click', (e) => {
 			e.stopPropagation();
-			document.querySelectorAll('.tree-label-selected').forEach((e2) => e2.classList.toggle('tree-label-selected'));
+			document.querySelectorAll('.tree-label-selected')
+					.forEach((e2) => e2.classList.toggle('tree-label-selected'));
 			e.target.classList.toggle('tree-label-selected');
 			loadDatum(e.target.dataset.name);
 		});
@@ -96,9 +97,19 @@ function getTreeNodeHTML(object, name) {
 			}
 		});
 		if (length > 0) {
-			node.insertAdjacentHTML('beforeend', `<span class='caret'>${searchString.length>0?'-':'+'}</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+			node.insertAdjacentHTML(
+				'beforeend',
+				`<span class='caret'>${searchString.length > 0 ?
+									   '-' :
+									   '+'}</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(
+					name.lastIndexOf(DELIMITER) + 1)}</span>`
+			);
 		} else {
-			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+			node.insertAdjacentHTML(
+				'beforeend',
+				`<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-array type-icon'> </i>${name.substr(
+					name.lastIndexOf(DELIMITER) + 1)}</span>`
+			);
 		}
 	} else if (isObject(object)) {
 		let entries = Object.entries(object);
@@ -111,22 +122,48 @@ function getTreeNodeHTML(object, name) {
 			}
 		}
 		if (length > 0) {
-			node.insertAdjacentHTML('beforeend', `<span class='caret'>${searchString.length>0?'-':'+'}</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+			node.insertAdjacentHTML(
+				'beforeend',
+				`<span class='caret'>${searchString.length > 0 ?
+									   '-' :
+									   '+'}</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(
+					name.lastIndexOf(DELIMITER) + 1)}</span>`
+			);
 		} else {
-			node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+			node.insertAdjacentHTML(
+				'beforeend',
+				`<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-object type-icon'> </i>${name.substr(
+					name.lastIndexOf(DELIMITER) + 1)}</span>`
+			);
 		}
 	} else if (isNumber(object)) {
-		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-number type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+		node.insertAdjacentHTML(
+			'beforeend',
+			`<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-number type-icon'> </i>${name.substr(
+				name.lastIndexOf(DELIMITER) + 1)}</span>`
+		);
 	} else if (object === true || object === false) {
-		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-bool type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+		node.insertAdjacentHTML(
+			'beforeend',
+			`<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-bool type-icon'> </i>${name.substr(
+				name.lastIndexOf(DELIMITER) + 1)}</span>`
+		);
 	} else {
-		node.insertAdjacentHTML('beforeend', `<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-string type-icon'> </i>${name.substr(name.lastIndexOf(DELIMITER) + 1)}</span>`);
+		node.insertAdjacentHTML(
+			'beforeend',
+			`<span class='caret'>&nbsp;</span><span class='tree-label' data-name='${name}'><i class='type-icon-string type-icon'> </i>${name.substr(
+				name.lastIndexOf(DELIMITER) + 1)}</span>`
+		);
 	}
-	if (list.length > 0 || (searchString.length === 0 || name.toLowerCase().includes(searchString.toLowerCase()))) {
+	if (list.length > 0 || (searchString.length === 0 || name.toLowerCase()
+															 .includes(searchString.toLowerCase()))) {
 		let nodeList = document.createElement('ul');
 		nodeList.classList.add('tree-node-list');
-		if (searchString.length > 0 && name.split(DELIMITER).pop().toLowerCase().includes(searchString.toLowerCase())){
-			nodeList.classList.add('active-tree')
+		if (searchString.length > 0 && name.split(DELIMITER)
+										   .pop()
+										   .toLowerCase()
+										   .includes(searchString.toLowerCase())) {
+			nodeList.classList.add('active-tree');
 		}
 		for (let i = 0; i < list.length; i++) {
 			nodeList.appendChild(list[i]);
@@ -180,7 +217,8 @@ function loadDatum(path) {
 			if (isObject(o)) {
 				editor.insertAdjacentHTML('beforeend', `
 														<div class="table-row">
-															<input class="key-input" value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
+															<input class="key-input" value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(
+					o)} id="id-input">${JSON.stringify(o)}</textarea>
 															<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
 														</div>`
 				);
@@ -290,17 +328,23 @@ function loadDatum(path) {
 
 	}
 	if (!!!document.querySelector('#save-btn')) {
-		document.querySelector('#editor-content').insertAdjacentHTML('beforeend', '<button id="save-btn" class="save-btn raised-button">Save</button>');
+		document.querySelector('#editor-content')
+				.insertAdjacentHTML(
+					'beforeend',
+					'<button id="save-btn" class="save-btn raised-button">Save</button>'
+				);
 		document.querySelector('#save-btn').addEventListener('click', () => {
 			saveDatum();
 		});
 	}
-	document.querySelectorAll('.key-input[readonly]').forEach(e => e.addEventListener('keydown', () =>
-		alert('Array indices cannot be modified!')
-	));
-	document.querySelectorAll('.value-input[readonly]').forEach(e => e.addEventListener('keydown', () =>
-		alert('Objects and arrays must be edited in their own node!')
-	));
+	document.querySelectorAll('.key-input[readonly]')
+			.forEach(e => e.addEventListener('keydown', () =>
+				alert('Array indices cannot be modified!')
+			));
+	document.querySelectorAll('.value-input[readonly]')
+			.forEach(e => e.addEventListener('keydown', () =>
+				alert('Objects and arrays must be edited in their own node!')
+			));
 	document.querySelectorAll('.delete-row').forEach(e => e.addEventListener('click', (e) => {
 		e.target.parentNode.remove();
 		if (Array.isArray(currentNode)) {
@@ -352,31 +396,31 @@ function pasteDatum() {
 
 }
 
-function clearNode(node){
+function clearNode(node) {
 	if (Array.isArray(node)) {
 		let length = 0;
 		node.forEach((value, key) => {
-			if (isObject(value)|| Array.isArray(value)){
-				clearNode(node[key])
+			if (isObject(value) || Array.isArray(value)) {
+				clearNode(node[key]);
 			} else if (isNumber(node[key])) {
 				node[key] = 0;
 			} else if (node[key] === true || node[key] === false) {
 				node[key] = false;
 			} else {
-				node[key] = "";
+				node[key] = '';
 			}
 		});
 	} else if (isObject(node)) {
 		let entries = Object.entries(node);
 		for (const [key, value] of entries) {
-			if (isObject(value)|| Array.isArray(value)){
-				clearNode(node[key])
+			if (isObject(value) || Array.isArray(value)) {
+				clearNode(node[key]);
 			} else if (isNumber(node[key])) {
 				node[key] = 0;
 			} else if (node[key] === true || node[key] === false) {
 				node[key] = false;
 			} else {
-				node[key] = "";
+				node[key] = '';
 			}
 		}
 	}
@@ -430,7 +474,7 @@ function isObject(obj) {
 }
 
 function isNumber(n) {
-	return typeof n === "number";
+	return typeof n === 'number';
 }
 
 function saveFile() {
@@ -455,7 +499,8 @@ document.querySelector('#load-file-button').addEventListener('click', () => {
 
 document.querySelector('#new-json-button').addEventListener('click', () => {
 	if (data !== undefined) {
-		if (!confirm('Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?')) {
+		if (!confirm(
+			'Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?')) {
 			return;
 		}
 	}
@@ -535,7 +580,8 @@ document.querySelector('#paste-button').addEventListener('click', () => {
 });
 
 document.querySelector('#clear-button').addEventListener('click', () => {
-	if (confirm("Are you sure you want to clear all JSON values?\nAll values in the current editing JSON will be removed.")){
+	if (confirm(
+		'Are you sure you want to clear all JSON values?\nAll values in the current editing JSON will be removed.')) {
 		clearNode(currentNode);
 		loadData(JSON.stringify(data));
 	}

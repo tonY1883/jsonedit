@@ -6,6 +6,7 @@ export class JSONEdit {
     #editingNode;
     #editingNodePath;
     #editingNodeMaxIndex;
+    #copyingNode;
     //settings
     #autoTypeConvert = true;
     //UI elements
@@ -406,6 +407,37 @@ export class JSONEdit {
             return undefined;
         }
     }
+    copyDatum() {
+        this.#copyingNode = JSON.stringify(this.#editingNode);
+        alert("Current element copied.");
+    }
+    pasteDatum() {
+        if (!!this.#copyingNode) {
+            let newRow;
+            if (Array.isArray(this.#editingNode)) {
+                newRow = `
+			<div class='table-row'>
+				<input class='key-input' readonly value=''> : 
+				<textarea class='table-cell value-input' readonly id='id-input'>
+					${this.#copyingNode}
+				</textarea>
+				<button class='delete-row'><i class='material-icons'style='vertical-align: middle;'>remove_circle</i>Delete</button>
+			</div>`;
+            }
+            else {
+                newRow = `
+			<div class='table-row'>
+				<input class='key-input'> : 
+				<textarea class='table-cell value-input' readonly id='id-input'>
+					${this.#copyingNode}
+				</textarea>
+				<button class='delete-row'><i class='material-icons'style='vertical-align: middle;'>remove_circle</i>Delete</button>
+			</div>`;
+            }
+            document.querySelector("#new-row").insertAdjacentHTML("beforebegin", newRow);
+            this.reloadIndices();
+        }
+    }
     isObject(obj) {
         return obj === Object(obj);
     }
@@ -470,6 +502,12 @@ export class JSONEdit {
             this.#jsonInputDialog.close();
         });
         this.setPopupCloseTrigger(this.#jsonInputDialog);
+        this.#copyButton.addEventListener("click", () => {
+            this.copyDatum();
+        });
+        this.#pasteButton.addEventListener("click", () => {
+            this.pasteDatum();
+        });
     }
     setPopupCloseTrigger(popup) {
         //TODO replace this with https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog#closedby

@@ -298,22 +298,13 @@ textarea {
 	height: 100%;
 }
 
-.modal {
-	display: none;
-	position: fixed;
-	z-index: 1;
-	left: 0;
-	top: 0;
-	width: 100vw;
-	height: 100vh;
-	overflow: hidden;
+::backdrop {
 	background-color: rgb(0, 0, 0); /* Fallback color */
 	background-color: rgba(0, 0, 0, 0.3); /* Black w/ opacity */
 }
 
 .modal-content {
-	z-index: 1000;
-	display: block;
+	border: none;
 	width: 60vw;
 	background-color: white;
 	margin: auto;
@@ -324,8 +315,7 @@ textarea {
 }
 
 .modal-content-small {
-	z-index: 1000;
-	display: block;
+	border: none;
 	width: 20vw;
 	background-color: white;
 	margin: auto;

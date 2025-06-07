@@ -16,13 +16,14 @@ export class JSONEdit {
     #saveFileButton = document.querySelector("#save-file-button");
     #loadFileButton = document.querySelector("#load-file-button");
     #saveJsonStringButton = document.querySelector("#save-string-button");
-    #loadJsonStringButton = document.querySelector("#load-file-button");
+    #loadJsonStringButton = document.querySelector("#load-string-button");
     #newJSONButton = document.querySelector("#new-json-button");
     #copyButton = document.querySelector("#copy-button");
     #pasteButton = document.querySelector("#paste-button");
     #clearButton = document.querySelector("#clear-button");
+    #settingButton = document.querySelector("#setting-button");
     //dialogs
-    #jsonInputDialog = document.querySelector("#modal-string-out");
+    #jsonInputDialog = document.querySelector("#modal-string");
     #jsonOutputDialog = document.querySelector("#modal-string-out");
     #newJsonDialog = document.querySelector("#modal-new-json-root");
     #settingDialog = document.querySelector("#modal-setting");
@@ -40,6 +41,7 @@ export class JSONEdit {
         });
     }
     loadData(string) {
+        //TODO background loading for large json
         try {
             this.#data = JSON.parse(string);
         }
@@ -47,7 +49,7 @@ export class JSONEdit {
             alert("Your JSON contains syntax errors!\n" + "Fail to parse JSON: " + err.message);
             return;
         }
-        document.querySelector('#save-json-button').style.visibility = 'visible';
+        document.querySelector("#save-json-button").style.visibility = "visible";
         this.#dataBrowser.style.visibility = "visible";
         if (this.#fileName !== undefined) {
             document.title = "JSONEdit: " + this.#fileName;
@@ -107,10 +109,11 @@ export class JSONEdit {
         });
     }
     loadDatum(path) {
+        //TODO background loading for large json
         let pathComponents = path.split(this.DELIMITER);
         let index;
         let targetObj;
-        this.#editor.innerHTML = '';
+        this.#editor.innerHTML = "";
         index = 1;
         targetObj = this.#data;
         for (let i = index; i < pathComponents.length; i++) {
@@ -133,14 +136,14 @@ export class JSONEdit {
             this.#editingNodeMaxIndex = this.#editingNode.length;
             this.#editingNode.forEach((o, i) => {
                 if (this.isObject(o)) {
-                    this.#editor.insertAdjacentHTML('beforeend', `
+                    this.#editor.insertAdjacentHTML("beforeend", `
 															<div class="table-row">
 																<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
 																<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
 															</div>`);
                 }
                 else {
-                    this.#editor.insertAdjacentHTML('beforeend', `
+                    this.#editor.insertAdjacentHTML("beforeend", `
 															<div class="table-row">
 																<input class="key-input" readonly value=${i}> : <textarea class="table-cell value-input" value=${o} id="id-input">${o}</textarea>
 																<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
@@ -151,14 +154,14 @@ export class JSONEdit {
         else {
             for (let [i, o] of Object.entries(this.#editingNode)) {
                 if (this.isObject(o)) {
-                    this.#editor.insertAdjacentHTML('beforeend', `
+                    this.#editor.insertAdjacentHTML("beforeend", `
 															<div class="table-row">
 																<input class="key-input" value=${i}> : <textarea class="table-cell value-input" readonly value=${JSON.stringify(o)} id="id-input">${JSON.stringify(o)}</textarea>
 																<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
 															</div>`);
                 }
                 else {
-                    this.#editor.insertAdjacentHTML('beforeend', `
+                    this.#editor.insertAdjacentHTML("beforeend", `
 															<div class="table-row">
 																<input class="key-input" value=${i}> : <textarea class="table-cell value-input" value=${o} id="id-input">${o}</textarea>
 																<button class='delete-row'><i class="material-icons" style="vertical-align: middle;">remove_circle</i>Delete</button>
@@ -166,9 +169,9 @@ export class JSONEdit {
                 }
             }
         }
-        if (!document.querySelectorAll('.new').length) {
+        if (!document.querySelectorAll(".new").length) {
             //FIXME can this be fixed not generated every time?
-            this.#editor.insertAdjacentHTML('beforeend', `
+            this.#editor.insertAdjacentHTML("beforeend", `
 				<div class='table-row' id='new-row'>
 					<button class='new'>
 						<i class='material-icons' style='vertical-align: middle;'>add_circle</i>
@@ -181,8 +184,8 @@ export class JSONEdit {
 					</ul>
 				</div>
 			`);
-            document.querySelector('#new-value-button').addEventListener('click', () => {
-                document.querySelector('#new-option').style.display = 'none';
+            document.querySelector("#new-value-button").addEventListener("click", () => {
+                document.querySelector("#new-option").style.display = "none";
                 let newRow;
                 if (Array.isArray(this.#editingNode)) {
                     newRow = `
@@ -204,11 +207,11 @@ export class JSONEdit {
 						</div>
 					`;
                 }
-                document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
+                document.querySelector("#new-row").insertAdjacentHTML("beforebegin", newRow);
                 this.reloadIndices();
             });
-            document.querySelector('#new-array-button').addEventListener('click', () => {
-                document.querySelector('#new-option').style.display = 'none';
+            document.querySelector("#new-array-button").addEventListener("click", () => {
+                document.querySelector("#new-option").style.display = "none";
                 let newRow;
                 if (Array.isArray(this.#editingNode)) {
                     newRow = `
@@ -230,11 +233,11 @@ export class JSONEdit {
 						</div>
 					`;
                 }
-                document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
+                document.querySelector("#new-row").insertAdjacentHTML("beforebegin", newRow);
                 this.reloadIndices();
             });
-            document.querySelector('#new-object-button').addEventListener('click', () => {
-                document.querySelector('#new-option').style.display = 'none';
+            document.querySelector("#new-object-button").addEventListener("click", () => {
+                document.querySelector("#new-option").style.display = "none";
                 let newRow;
                 if (Array.isArray(this.#editingNode)) {
                     newRow = `
@@ -256,36 +259,37 @@ export class JSONEdit {
 						</div>
 					`;
                 }
-                document.querySelector('#new-row').insertAdjacentHTML('beforebegin', newRow);
+                document.querySelector("#new-row").insertAdjacentHTML("beforebegin", newRow);
                 this.reloadIndices();
             });
-            document.querySelectorAll('.new').forEach(e => e.addEventListener('click', () => {
-                document.querySelector('#new-option').style.display = 'block';
+            document.querySelectorAll(".new").forEach((e) => e.addEventListener("click", () => {
+                document.querySelector("#new-option").style.display = "block";
             }));
         }
-        if (!!!document.querySelector('#save-btn')) {
-            this.#editor
-                .insertAdjacentHTML('beforeend', '<button id="save-btn" class="save-btn raised-button">Save</button>');
-            document.querySelector('#save-btn').addEventListener('click', () => {
+        if (!!!document.querySelector("#save-btn")) {
+            this.#editor.insertAdjacentHTML("beforeend", '<button id="save-btn" class="save-btn raised-button">Save</button>');
+            document.querySelector("#save-btn").addEventListener("click", () => {
                 this.saveDatum();
             });
         }
-        document.querySelectorAll('.key-input[readonly]')
-            .forEach(e => e.addEventListener('keydown', () => alert('Array indices cannot be modified!')));
-        document.querySelectorAll('.value-input[readonly]')
-            .forEach(e => e.addEventListener('keydown', () => alert('Objects and arrays must be edited in their own node!')));
-        document.querySelectorAll('.delete-row').forEach(e => e.addEventListener('click', (e) => {
+        document
+            .querySelectorAll(".key-input[readonly]")
+            .forEach((e) => e.addEventListener("keydown", () => alert("Array indices cannot be modified!")));
+        document
+            .querySelectorAll(".value-input[readonly]")
+            .forEach((e) => e.addEventListener("keydown", () => alert("Objects and arrays must be edited in their own node!")));
+        document.querySelectorAll(".delete-row").forEach((e) => e.addEventListener("click", (e) => {
             e.target.parentNode.remove();
             this.reloadIndices();
         }));
-        document.querySelector('#edit-button').style.visibility = 'visible';
+        document.querySelector("#edit-button").style.visibility = "visible";
     }
     saveDatum() {
         const currentNodeOld = JSON.parse(JSON.stringify(this.#editingNode)); //deep cloning (JSON compatible only)
         const oldKeys = Object.keys(currentNodeOld);
-        const keys = document.querySelectorAll('.key-input');
+        const keys = document.querySelectorAll(".key-input");
         const newKeys = [];
-        let values = document.querySelectorAll('.value-input');
+        let values = document.querySelectorAll(".value-input");
         keys.forEach((o, i) => {
             newKeys.push(o.value);
             if (values[i].readOnly) {
@@ -309,8 +313,8 @@ export class JSONEdit {
                     if (this.isNumber(newValue)) {
                         newValue = Number(newValue);
                     }
-                    else if (newValue === 'true' || newValue === 'false') {
-                        newValue = newValue === 'true';
+                    else if (newValue === "true" || newValue === "false") {
+                        newValue = newValue === "true";
                     }
                 }
                 this.#editingNode[index] = newValue;
@@ -324,12 +328,12 @@ export class JSONEdit {
         });
         //refresh tree
         this.loadData(JSON.stringify(this.#data));
-        alert('Content saved.');
+        alert("Content saved.");
     }
     reloadIndices() {
         if (Array.isArray(this.#editingNode)) {
-            const keys = document.querySelectorAll('.key-input');
-            keys.forEach((o, i) => o.value = i.toString());
+            const keys = document.querySelectorAll(".key-input");
+            keys.forEach((o, i) => (o.value = i.toString()));
         }
         else {
             //no need to reload.
@@ -418,6 +422,65 @@ export class JSONEdit {
         this.#filterInput.addEventListener("keyup", (e) => {
             this.#searchString = e.target.value;
             this.reload();
+        });
+        this.#newJSONButton.addEventListener("click", () => {
+            if (this.#data !== undefined) {
+                if (!confirm("Creating a new JSON will discard the JSON you are currently editing.\nAre you sure you want to continue?")) {
+                    return;
+                }
+            }
+            this.#newJsonDialog.showModal();
+        });
+        this.setPopupCloseTrigger(this.#newJsonDialog);
+        document.querySelector("#new-json").addEventListener("click", () => {
+            if (document.querySelector("#option-ary").checked === true) {
+                this.loadData("[]");
+                this.#newJsonDialog.close();
+            }
+            else if (document.querySelector("#option-obj").checked === true) {
+                this.loadData("{}");
+                this.#newJsonDialog.close();
+            }
+        });
+        this.#settingButton.addEventListener("click", () => {
+            this.#settingDialog.showModal();
+        });
+        this.setPopupCloseTrigger(this.#settingDialog);
+        document.querySelector("#save-setting").addEventListener("click", () => {
+            this.#autoTypeConvert = document.querySelector("#option-type-convert").checked;
+            this.#settingDialog.close();
+        });
+        this.#saveJsonStringButton.addEventListener("click", () => {
+            this.#jsonOutputDialog.showModal();
+            const output = document.querySelector("#string-output");
+            output.value = JSON.stringify(this.#data);
+            output.focus();
+            output.select();
+        });
+        this.setPopupCloseTrigger(this.#jsonOutputDialog);
+        document.querySelector("#copy-string").addEventListener("click", () => {
+            navigator.clipboard.writeText(JSON.stringify(this.#data));
+            alert("Output JSON copied to your clipboard.");
+        });
+        this.#loadJsonStringButton.addEventListener("click", () => {
+            this.#jsonInputDialog.showModal();
+        });
+        document.querySelector("#load-string").addEventListener("click", () => {
+            this.loadData(document.querySelector("#string-input").value);
+            this.#jsonInputDialog.close();
+        });
+        this.setPopupCloseTrigger(this.#jsonInputDialog);
+    }
+    setPopupCloseTrigger(popup) {
+        //TODO replace this with https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog#closedby
+        popup.addEventListener("click", (event) => {
+            const boundingBox = popup.getBoundingClientRect();
+            if (!(boundingBox.top <= event.clientY &&
+                event.clientY <= boundingBox.top + boundingBox.height &&
+                boundingBox.left <= event.clientX &&
+                event.clientX <= boundingBox.left + boundingBox.width)) {
+                popup.close();
+            }
         });
     }
 }

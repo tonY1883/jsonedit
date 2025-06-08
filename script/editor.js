@@ -109,6 +109,11 @@ export class JSONEdit {
             });
         });
     }
+    refreshTree() {
+        if (!!this.#data) {
+            this.loadData(JSON.stringify(this.#data));
+        }
+    }
     loadDatum(path) {
         //TODO background loading for large json
         let pathComponents = path.split(this.DELIMITER);
@@ -285,6 +290,41 @@ export class JSONEdit {
         }));
         document.querySelector("#edit-button").style.visibility = "visible";
     }
+    clearNode(node) {
+        if (Array.isArray(node)) {
+            node.forEach((value, key) => {
+                if (this.isObject(value) || Array.isArray(value)) {
+                    this.clearNode(node[key]);
+                }
+                else if (this.isNumber(node[key])) {
+                    node[key] = 0;
+                }
+                else if (node[key] === true || node[key] === false) {
+                    node[key] = false;
+                }
+                else {
+                    node[key] = "";
+                }
+            });
+        }
+        else if (this.isObject(node)) {
+            let entries = Object.entries(node);
+            for (const [key, value] of entries) {
+                if (this.isObject(value) || Array.isArray(value)) {
+                    this.clearNode(node[key]);
+                }
+                else if (this.isNumber(node[key])) {
+                    node[key] = 0;
+                }
+                else if (node[key] === true || node[key] === false) {
+                    node[key] = false;
+                }
+                else {
+                    node[key] = "";
+                }
+            }
+        }
+    }
     saveDatum() {
         const currentNodeOld = JSON.parse(JSON.stringify(this.#editingNode)); //deep cloning (JSON compatible only)
         const oldKeys = Object.keys(currentNodeOld);
@@ -328,7 +368,7 @@ export class JSONEdit {
             }
         });
         //refresh tree
-        this.loadData(JSON.stringify(this.#data));
+        this.refreshTree();
         alert("Content saved.");
     }
     reloadIndices() {
@@ -507,6 +547,16 @@ export class JSONEdit {
         });
         this.#pasteButton.addEventListener("click", () => {
             this.pasteDatum();
+        });
+        this.#clearButton.addEventListener("click", () => {
+            if (confirm("Are you sure you want to clear all JSON values?\nAll values in the current editing JSON will be removed.")) {
+                this.clearNode(this.#editingNode);
+                this.refreshTree();
+            }
+        });
+        this.#filterInput.addEventListener("keyup", (e) => {
+            this.#searchString = e.target.value;
+            this.refreshTree();
         });
     }
     setPopupCloseTrigger(popup) {

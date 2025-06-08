@@ -4,8 +4,6 @@ export class JSONEdit {
     #fileName;
     #searchString = "";
     #editingNode;
-    #editingNodePath;
-    #editingNodeMaxIndex;
     #copyingNode;
     //settings
     #autoTypeConvert = true;
@@ -136,10 +134,8 @@ export class JSONEdit {
             return this.loadDatum(pathComponents.join(this.DELIMITER));
         }
         this.#editingNode = targetObj;
-        this.#editingNodePath = path;
         //TODO reduce repeated code
         if (Array.isArray(this.#editingNode)) {
-            this.#editingNodeMaxIndex = this.#editingNode.length;
             this.#editingNode.forEach((o, i) => {
                 if (this.isObject(o)) {
                     this.#editor.insertAdjacentHTML("beforeend", `
